@@ -39,15 +39,9 @@ Don't change or reuse an `id` once it's published, because saved progress uses i
 
 ## Deploy free on GitHub Pages
 
-Pushing to `main` runs `.github/workflows/deploy.yml`, which tests, builds and publishes the site.
+Pushing to `main` runs `.github/workflows/deploy.yml`. It tests and builds the app, then publishes `dist/` to the `gh-pages` branch, which GitHub Pages serves.
 
-The first time:
-
-1. On GitHub, open the repository and go to **Settings → Pages**.
-2. Under **Build and deployment → Source**, choose **GitHub Actions**.
-3. Push to `main`, or re-run the workflow from the **Actions** tab.
-
-The app will be at `https://<your-username>.github.io/<repo-name>/`.
+The app is at `https://<your-username>.github.io/<repo-name>/`. If it doesn't appear, open **Settings → Pages** and check that the source is **Deploy from a branch**, using the `gh-pages` branch and the `/ (root)` folder.
 
 ## Project layout
 
