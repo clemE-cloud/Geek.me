@@ -1,0 +1,491 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Daily Spark</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: one reading column like a pocket almanac page; tab bar at the thumb. */
+:root{
+  --bg:#F2F3EE; --surface:#FFFFFF; --ink:#1C2333; --muted:#5E6676; --line:#DCDFD6;
+  --accent:#D99A00; --accent-ink:#5A3E00; --btn:#1C2333; --btn-fg:#FFFFFF;
+  --good:#1E8A4C; --bad:#C2412D;
+  --s1:#2F6FD6; --s2:#B5532E; --s3:#7A4CC2; --s4:#13866F; --s5:#B8357A; --s6:#8A6A12;
+  --f-display:"Bricolage Grotesque",ui-sans-serif,system-ui,sans-serif;
+  --f-body:"Source Serif 4",Georgia,"Times New Roman",serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  --f-ui:system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#12151C; --surface:#1B202B; --ink:#E8EBF1; --muted:#9BA3B4; --line:#2B3242;
+  --accent:#F2B630; --accent-ink:#F2B630; --btn:#E8EBF1; --btn-fg:#12151C;
+  --good:#4CC27F; --bad:#F07560;
+  --s1:#7DA8F5; --s2:#F09A74; --s3:#B79CF0; --s4:#5CCDB2; --s5:#F08DC0; --s6:#DDBA5A;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#12151C; --surface:#1B202B; --ink:#E8EBF1; --muted:#9BA3B4; --line:#2B3242;
+  --accent:#F2B630; --accent-ink:#F2B630; --btn:#E8EBF1; --btn-fg:#12151C;
+  --good:#4CC27F; --bad:#F07560;
+  --s1:#7DA8F5; --s2:#F09A74; --s3:#B79CF0; --s4:#5CCDB2; --s5:#F08DC0; --s6:#DDBA5A;
+  color-scheme:dark}
+html,body{background:var(--bg);color:var(--ink)}
+body{font-family:var(--f-ui);font-size:15px;line-height:1.5}
+.wrap{max-width:620px;margin:0 auto;padding-block:20px 110px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:20px}
+h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;letter-spacing:-.01em}
+.label{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* header */
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.brand{display:flex;flex-direction:column}
+.brand h1{font-size:26px;font-weight:800;line-height:1.1}
+.stats{display:flex;gap:8px}
+.stat{display:flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-family:var(--f-mono);font-size:13px;font-variant-numeric:tabular-nums}
+.stat svg{width:16px;height:16px}
+.flame{color:var(--accent)}
+.week{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.dayc{display:flex;flex-direction:column;align-items:center;gap:4px}
+.dot{width:100%;max-width:38px;aspect-ratio:1;border-radius:10px;border:1.5px dashed var(--line);display:grid;place-items:center}
+.dot.on{background:var(--accent);border:0;color:#1C2333}
+.dot.today{border-style:solid;border-color:var(--ink)}
+.dayc .label{font-size:10px}
+
+/* lesson */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:22px 20px;display:flex;flex-direction:column;gap:14px}
+.chip{display:inline-flex;align-items:center;gap:6px;font-family:var(--f-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:3px 9px;border-radius:999px;color:var(--c);background:color-mix(in srgb,var(--c) 14%,transparent);width:max-content}
+.meta{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.lesson-title{font-size:clamp(26px,6vw,34px);font-weight:800;line-height:1.08}
+.prose{font-family:var(--f-body);font-size:18px;line-height:1.62;display:flex;flex-direction:column;gap:12px;max-width:62ch}
+.prose p{margin:0}
+.take{border-top:1px solid var(--line);padding-top:14px;display:flex;flex-direction:column;gap:4px}
+.take p{margin:0;font-family:var(--f-body);font-weight:600;font-size:17px}
+.btn{border:0;border-radius:14px;padding:14px 18px;font-weight:650;font-size:16px;background:var(--btn);color:var(--btn-fg);display:inline-flex;justify-content:center;align-items:center;gap:8px}
+.btn.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
+.btn:disabled{opacity:.5;cursor:default}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.row .btn{flex:1 1 180px}
+
+/* quiz */
+.progress{height:8px;background:var(--line);border-radius:99px;overflow:hidden}
+.progress>i{display:block;height:100%;background:var(--accent);border-radius:99px;transition:width .3s}
+.q{font-family:var(--f-display);font-size:22px;font-weight:600;line-height:1.25}
+.opts{display:flex;flex-direction:column;gap:10px}
+.opt{text-align:left;background:var(--surface);border:1.5px solid var(--line);border-radius:14px;padding:13px 15px;font-size:16px;display:flex;gap:12px;align-items:flex-start}
+.opt .k{font-family:var(--f-mono);font-size:12px;color:var(--muted);border:1px solid var(--line);border-radius:6px;padding:1px 6px;margin-top:2px}
+.opt:hover:not(:disabled){border-color:var(--ink)}
+.opt.right{border-color:var(--good);background:color-mix(in srgb,var(--good) 12%,var(--surface))}
+.opt.wrong{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 10%,var(--surface))}
+.opt:disabled{cursor:default}
+.fb{border-radius:14px;padding:12px 14px;font-size:15px}
+.fb b{display:block;font-family:var(--f-display);font-size:17px}
+.fb.ok{background:color-mix(in srgb,var(--good) 14%,transparent);color:var(--ink)}
+.fb.ok b{color:var(--good)}
+.fb.no{background:color-mix(in srgb,var(--bad) 12%,transparent)}
+.fb.no b{color:var(--bad)}
+
+/* result */
+.big{font-family:var(--f-display);font-size:44px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.tile{background:var(--bg);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:2px}
+.tile .big{font-size:26px}
+.muted{color:var(--muted)}
+.note{font-size:14px;color:var(--muted);margin:0}
+.topics{display:flex;flex-wrap:wrap;gap:8px}
+.topic{border:1.5px solid var(--line);background:transparent;border-radius:999px;padding:6px 12px;font-size:14px}
+.topic[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+
+/* bank */
+.search{width:100%;box-sizing:border-box;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);border-radius:12px;padding:12px 14px;font-size:16px}
+.filters{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px}
+.filters .topic{flex:none}
+.list{display:flex;flex-direction:column;gap:10px}
+.item{text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:6px}
+.item h3{font-size:18px;font-weight:600}
+.item p{margin:0;font-family:var(--f-body);color:var(--muted);font-size:15px}
+.item .meta{justify-content:space-between}
+.empty{text-align:center;padding:28px 16px;display:flex;flex-direction:column;gap:8px;align-items:center;border:1.5px dashed var(--line);border-radius:18px}
+.boxes{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;align-items:end;height:80px}
+.boxes div{display:flex;flex-direction:column;align-items:center;gap:4px;height:100%;justify-content:flex-end}
+.boxes i{display:block;width:100%;background:var(--accent);border-radius:6px 6px 2px 2px;min-height:3px}
+.back{background:none;border:0;padding:0;color:var(--muted);font-size:15px;display:inline-flex;gap:6px;align-items:center;width:max-content}
+
+/* tabbar */
+.tabs{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--line);display:flex;justify-content:center;padding-bottom:env(safe-area-inset-bottom,0px);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));z-index:5}
+.tabs-in{display:grid;grid-template-columns:repeat(3,1fr);width:100%;max-width:620px}
+.tab{background:none;border:0;padding:10px 4px 12px;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:12px;color:var(--muted);position:relative}
+.tab svg{width:22px;height:22px}
+.tab[aria-selected="true"]{color:var(--ink);font-weight:650}
+.badge{position:absolute;top:6px;left:calc(50% + 6px);background:var(--accent);color:#1C2333;font-family:var(--f-mono);font-size:10px;border-radius:99px;padding:0 5px;line-height:16px}
+.spin{width:16px;height:16px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:sp 1s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+@keyframes pop{0%{transform:scale(.6);opacity:0}100%{transform:none;opacity:1}}
+.pop{animation:pop .35s cubic-bezier(.2,1.4,.4,1)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<nav class="tabs" aria-label="Sections"><div class="tabs-in" role="tablist" id="tabs"></div></nav>
+
+<script src="lessons.js"></script>
+<script>
+
+const SUBJECTS = ["Science","History","Mind","Language","Math","Nature","Economics","Art","Philosophy","Space","Music","Geography","Health","Technology"];
+const HUE = s => "var(--s"+((Math.abs([...s].reduce((h,c)=>h*31+c.charCodeAt(0)|0,7))%6)+1)+")";
+const BOX_DAYS = [1,2,4,7,15,30,60];
+const HAS_CLAUDE = !!window.claude?.use;   // only inside claude.ai; elsewhere we run on the built-in library
+
+/* ---------- utils ---------- */
+const $ = s => document.querySelector(s);
+const esc = s => String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const ymd = d => { const z=n=>String(n).padStart(2,"0"); return d.getFullYear()+"-"+z(d.getMonth()+1)+"-"+z(d.getDate()); };
+const parse = s => { const [y,m,d]=s.split("-").map(Number); return new Date(y,m-1,d); };
+const addDays = (s,n) => { const d=parse(s); d.setDate(d.getDate()+n); return ymd(d); };
+const TODAY = () => ymd(new Date());
+const mins = l => Math.max(1,Math.round(l.body.join(" ").split(/\s+/).length/200));
+const ICON = {
+ flame:'<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2c1 4 5 6 5 11a5 5 0 0 1-10 0c0-2 1-3.5 2-4.5 0 2 1 3 2 3 0-4-1-6 1-9.5z"/></svg>',
+ bolt:'<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg>',
+ sun:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>',
+ loop:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 12a9 9 0 0 1 15.5-6.2L21 8M21 3v5h-5M21 12a9 9 0 0 1-15.5 6.2L3 16M3 21v-5h5"/></svg>',
+ book:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h6a3 3 0 0 1 3 3v13a2 2 0 0 0-2-2H4zM20 4h-6a3 3 0 0 0-3 3v13a2 2 0 0 1 2-2h7z"/></svg>',
+ check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" width="14" height="14" aria-hidden="true"><path d="m5 12 5 5 9-10"/></svg>'
+};
+
+/* ---------- state + storage ---------- */
+const fresh = () => ({streak:0,best:0,xp:0,lastDone:null,days:[],cards:{},interests:["Science","History","Mind","Language","Nature","Space"],todayDate:null,todayId:null,pending:null});
+let P = fresh();           // progress
+let L = {};                // learned lessons by id
+let store = {mode:"memory"};
+let ready = false;
+
+const LS_KEY = "daily-spark-v1";
+function lsGet(){ try{ return JSON.parse(localStorage.getItem(LS_KEY)||"null"); }catch{ return null; } }
+function lsSet(){ try{ localStorage.setItem(LS_KEY,JSON.stringify({P,L})); }catch{} }
+
+let chain = Promise.resolve();
+function queue(fn){ chain = chain.then(fn).catch(e=>console.warn("save failed",e)); return chain; }
+
+async function initStore(){
+  const c = window.claude;
+  if(c?.use){
+    try{
+      const [db,user] = await Promise.all([c.use("db"),c.use("user")]);
+      const uid = user ? await user.id() : null;
+      if(db && uid){
+        const pref = db.doc("data/users/"+uid+"/progress");
+        store = {mode:"db",pref,lcol:pref.collection("lessons")};
+        const [ps,ls] = await Promise.all([pref.get(),store.lcol.get()]);
+        if(ps.exists){
+          P = {...fresh(),...structuredClone(ps.data())};
+          ls.docs.forEach(d=>{ if(d.exists) L[d.id]=structuredClone(d.data()); });
+        } else {
+          const local = lsGet();
+          if(local){ P={...fresh(),...local.P}; L=local.L||{}; await saveAll(); }
+        }
+        return;
+      }
+    }catch(e){ console.warn("db unavailable",e); }
+  }
+  const local = lsGet();
+  if(local){ P={...fresh(),...local.P}; L=local.L||{}; }
+  store = {mode:"local"};
+}
+function saveProgress(){
+  lsSet();
+  if(store.mode==="db"){ const body=JSON.parse(JSON.stringify(P)); return queue(()=>store.pref.set(body)); }
+}
+function saveLesson(l){
+  lsSet();
+  if(store.mode==="db"){ const body=JSON.parse(JSON.stringify(l)); return queue(()=>store.lcol.doc(l.id).set(body)); }
+}
+async function saveAll(){ await saveProgress(); for(const l of Object.values(L)) await saveLesson(l); }
+
+/* ---------- lesson selection ---------- */
+const byId = id => L[id] || LIB.find(x=>x.id===id) || (P.pending && P.pending.id===id ? P.pending : null);
+function todaysLesson(){
+  const t = TODAY();
+  if(P.todayDate===t && P.todayId){ const l=byId(P.todayId); if(l) return l; }
+  const next = LIB.find(x=>!L[x.id]);
+  if(next){ P.todayDate=t; P.todayId=next.id; if(ready) saveProgress(); return next; }
+  if(P.pending && !L[P.pending.id]){ P.todayDate=t; P.todayId=P.pending.id; return P.pending; }
+  return null;
+}
+const doneToday = () => P.lastDone===TODAY();
+const streakNow = () => (P.lastDone===TODAY()||P.lastDone===addDays(TODAY(),-1)) ? P.streak : 0;
+function dueCards(){
+  const t=TODAY(), out=[];
+  for(const [k,c] of Object.entries(P.cards)){ const [id,qi]=k.split(":"); if(c.due<=t && L[id] && L[id].qs[+qi]) out.push({id,qi:+qi,k}); }
+  return out.sort((a,b)=>P.cards[a.k].due<P.cards[b.k].due?-1:1);
+}
+
+/* ---------- UI state ---------- */
+let tab = "today";
+let S = null;     // active session: {kind:'lesson'|'review', lesson, items, i, picked, results, bonus}
+let viewLesson = null; // bank reader
+let bankQ = "", bankF = "All";
+let gen = {busy:false,err:"",ctl:null};
+
+function render(){
+  const app=$("#app");
+  app.innerHTML = header() + (tab==="today"?viewToday():tab==="review"?viewReview():viewBank());
+  renderTabs();
+  bind();
+}
+function header(){
+  const t=TODAY(), days=new Set(P.days), cells=[];
+  for(let i=6;i>=0;i--){ const d=addDays(t,-i), dt=parse(d);
+    cells.push(`<div class="dayc"><div class="dot ${days.has(d)?"on":""} ${d===t?"today":""}">${days.has(d)?ICON.check:""}</div><span class="label">${dt.toLocaleDateString(undefined,{weekday:"narrow"})}</span></div>`); }
+  const dayN = P.days.length + (doneToday()?0:1);
+  return `<header class="top"><div class="brand"><span class="label">Day ${dayN} · ${new Date().toLocaleDateString(undefined,{weekday:"short",day:"numeric",month:"short"})}</span><h1>Daily Spark</h1></div>
+  <div class="stats"><span class="stat" title="Day streak"><span class="flame">${ICON.flame}</span>${streakNow()}</span><span class="stat" title="Total XP"><span class="flame">${ICON.bolt}</span>${P.xp} XP</span></div></header>
+  <div class="week" aria-label="Last 7 days">${cells.join("")}</div>`;
+}
+function renderTabs(){
+  const due=dueCards().length;
+  const items=[["today","Today",ICON.sun],["review","Review",ICON.loop],["bank","Knowledge bank",ICON.book]];
+  $("#tabs").innerHTML = items.map(([k,n,i])=>`<button class="tab" role="tab" data-tab="${k}" aria-selected="${tab===k}">${i}${k==="review"&&due?`<span class="badge">${due}</span>`:""}<span>${n}</span></button>`).join("");
+}
+const chip = s => `<span class="chip" style="--c:${HUE(s)}">${esc(s)}</span>`;
+
+function lessonBody(l){
+  return `<div class="meta">${chip(l.subject)}<span class="label">${mins(l)} min read</span></div>
+  <h2 class="lesson-title">${esc(l.title)}</h2>
+  <div class="prose">${l.body.map(p=>`<p>${esc(p)}</p>`).join("")}</div>
+  <div class="take"><span class="label">Remember this</span><p>${esc(l.takeaway)}</p></div>`;
+}
+
+/* ---------- Today ---------- */
+function viewToday(){
+  if(S && S.kind==="lesson") return viewSession();
+  if(doneToday()) return viewDone();
+  const l = todaysLesson();
+  if(!l) return HAS_CLAUDE ? genCard("You've read every lesson in the starter library. Claude can write a fresh one for you each day, on the topics you pick.", "Write today's lesson") : libraryDone();
+  return `<article class="card">${lessonBody(l)}
+    <button class="btn" data-act="quiz">Take the 3-question quiz</button></article>`;
+}
+function viewDone(){
+  const l = byId(P.todayId);
+  const nextLib = LIB.find(x=>!L[x.id]);
+  return `<section class="card pop"><span class="label">Today's spark is done</span>
+    <h2 style="font-size:28px">${P.streak} day streak</h2>
+    ${l?`<div class="take" style="border:0;padding:0"><span class="label">You learned</span><p>${esc(l.takeaway)}</p></div>`:""}
+    <p class="note">Come back tomorrow for a new lesson. ${dueCards().length?`You have ${dueCards().length} review question${dueCards().length>1?"s":""} due.`:"Nothing is due for review."}</p>
+    ${dueCards().length?`<button class="btn" data-tab-go="review">Review now</button>`:""}
+  </section>
+  ${nextLib?`<section class="card"><span class="label">Want more?</span><h3 style="font-size:20px">Bonus: ${esc(nextLib.title)}</h3><p class="note">Bonus lessons add XP and go into your bank.</p><button class="btn ghost" data-act="bonus" data-id="${nextLib.id}">Read a bonus lesson</button></section>`
+   : HAS_CLAUDE ? genCard("Want another? Claude can write a bonus lesson on one of your topics.","Write a bonus lesson") : libraryDone()}`;
+}
+function libraryDone(){
+  const due=dueCards().length;
+  return `<section class="card pop"><span class="label">Library complete</span>
+    <h2 style="font-size:26px">You've finished the library</h2>
+    <p class="note">You've read all ${LIB.length} lessons. Keep going in Review: spaced practice is what makes them stick. ${due?`You have ${due} question${due>1?"s":""} due now.`:"New questions will come due over the next few days."}</p>
+    <button class="btn" data-tab-go="review">Go to Review</button>
+  </section>`;
+}
+function genCard(text,cta){
+  return `<section class="card"><span class="label">New lesson by Claude</span><p style="margin:0">${text}</p>
+   <span class="label">Your topics</span>
+   <div class="topics">${SUBJECTS.map(s=>`<button class="topic" data-topic="${s}" aria-pressed="${P.interests.includes(s)}">${s}</button>`).join("")}</div>
+   ${gen.err?`<p class="note" style="color:var(--bad)">${esc(gen.err)}</p>`:""}
+   <div class="row"><button class="btn" data-act="gen" ${gen.busy?"disabled":""}>${gen.busy?'<span class="spin"></span> Writing your lesson…':cta}</button>${gen.busy?'<button class="btn ghost" data-act="stopgen">Stop</button>':""}</div>
+   <p class="note">Uses your Claude account. Lessons are saved to your bank once you finish the quiz.</p></section>`;
+}
+
+/* ---------- Sessions (lesson quiz + review) ---------- */
+function viewSession(){
+  const it = S.items[S.i], l = byId(it.id), q = l.qs[it.qi];
+  const pct = Math.round((S.i + (S.picked!=null?1:0)) / S.items.length * 100);
+  if(S.finished) return viewResult();
+  const fb = S.picked==null ? "" : (S.picked===q.a
+      ? `<div class="fb ok pop"><b>Correct</b>${esc(q.why)}</div>`
+      : `<div class="fb no pop"><b>Not quite. It's “${esc(q.o[q.a])}”</b>${esc(q.why)}</div>`);
+  return `<button class="back" data-act="quit">← ${S.kind==="lesson"?"Back to lesson":"End review"}</button>
+  <div class="progress" aria-label="Progress"><i style="width:${pct}%"></i></div>
+  <section class="card">
+    <div class="meta">${chip(l.subject)}<span class="label">${S.kind==="review"?"From: "+esc(l.title):"Question "+(S.i+1)+" of "+S.items.length}</span></div>
+    <p class="q">${esc(q.q)}</p>
+    <div class="opts">${q.o.map((o,i)=>{
+      const cls = S.picked==null?"":(i===q.a?"right":(i===S.picked?"wrong":""));
+      return `<button class="opt ${cls}" data-pick="${i}" ${S.picked!=null?"disabled":""}><span class="k">${"ABCD"[i]}</span><span>${esc(o)}</span></button>`;}).join("")}</div>
+    ${fb}
+    ${S.picked!=null?`<button class="btn" data-act="next">${S.i+1<S.items.length?"Next":"Finish"}</button>`:""}
+  </section>`;
+}
+function viewResult(){
+  const right=S.results.filter(Boolean).length, n=S.results.length;
+  const lesson = S.kind==="lesson";
+  return `<section class="card pop" style="align-items:flex-start">
+    <span class="label">${lesson?(S.bonus?"Bonus lesson complete":"Lesson complete"):"Review complete"}</span>
+    <div class="big">+${S.gained} XP</div>
+    <div class="tiles" style="width:100%">
+      <div class="tile"><span class="big">${right}/${n}</span><span class="label">Correct</span></div>
+      <div class="tile"><span class="big">${P.streak}</span><span class="label">Streak</span></div>
+      <div class="tile"><span class="big">${Object.keys(L).length}</span><span class="label">In bank</span></div>
+    </div>
+    <p class="note">${lesson?"These questions will come back in Review. Right answers return in 2 days, missed ones tomorrow.":"Correct answers move up a box and come back later. Missed ones reset to tomorrow."}</p>
+    <button class="btn" data-act="done" style="width:100%">Continue</button>
+  </section>`;
+}
+function startLesson(l,bonus){
+  S = {kind:"lesson",lesson:l,bonus:!!bonus,items:l.qs.map((_,qi)=>({id:l.id,qi})),i:0,picked:null,results:[]};
+  if(!L[l.id] && !LIB.find(x=>x.id===l.id) && (!P.pending || P.pending.id!==l.id)) P.pending=l;
+  tab="today"; render(); scrollTo(0,0);
+}
+function startReview(){
+  const due = dueCards().slice(0,8);
+  if(!due.length) return;
+  S = {kind:"review",items:due,i:0,picked:null,results:[]};
+  render(); scrollTo(0,0);
+}
+function pick(i){
+  const it=S.items[S.i], q=byId(it.id).qs[it.qi];
+  S.picked=i; S.results.push(i===q.a); render();
+}
+async function next(){
+  if(S.i+1<S.items.length){ S.i++; S.picked=null; render(); return; }
+  const t=TODAY(); let gained=0;
+  if(S.kind==="lesson"){
+    const l=S.lesson;
+    const rec = {...l,learnedOn:t};
+    L[l.id]=rec;
+    l.qs.forEach((_,qi)=>{ const ok=S.results[qi]; P.cards[l.id+":"+qi]={box:ok?1:0,due:addDays(t,ok?2:1)}; });
+    gained = 10 + 5*S.results.filter(Boolean).length;
+    if(P.lastDone!==t){
+      P.streak = (P.lastDone===addDays(t,-1)) ? P.streak+1 : 1;
+      P.lastDone=t; P.days=[...P.days.filter(d=>d!==t),t].slice(-120);
+      if(!S.bonus){ P.todayDate=t; P.todayId=l.id; }
+    }
+    P.best=Math.max(P.best,P.streak);
+    if(P.pending && P.pending.id===l.id) P.pending=null;
+    P.xp+=gained; S.gained=gained; S.finished=true; render();
+    await saveLesson(rec); await saveProgress();
+  } else {
+    S.items.forEach((it,ix)=>{ const c=P.cards[it.k]; const ok=S.results[ix];
+      const box = ok? Math.min(c.box+1,BOX_DAYS.length-1) : 0;
+      P.cards[it.k]={box,due:addDays(t,BOX_DAYS[box])}; if(ok) gained+=3; });
+    P.xp+=gained; S.gained=gained; S.finished=true; render();
+    await saveProgress();
+  }
+}
+
+/* ---------- Review tab ---------- */
+function viewReview(){
+  if(S && S.kind==="review") return viewSession();
+  const due=dueCards(), total=Object.keys(P.cards).length;
+  const counts=BOX_DAYS.map((_,b)=>Object.values(P.cards).filter(c=>c.box===b).length), max=Math.max(1,...counts);
+  const nextDue = Object.values(P.cards).map(c=>c.due).filter(d=>d>TODAY()).sort()[0];
+  return `<section class="card">
+    <span class="label">Spaced review</span>
+    <h2 style="font-size:26px">${due.length?`${due.length} question${due.length>1?"s":""} due`:"All caught up"}</h2>
+    <p class="note">${total?(due.length?"Answer from memory. Getting it right pushes the question further out; missing it brings it back tomorrow.":`Next review ${nextDue?("on "+parse(nextDue).toLocaleDateString(undefined,{weekday:"long",day:"numeric",month:"short"})):"soon"}.`):"Finish your first lesson and its questions will start showing up here."}</p>
+    ${due.length?`<button class="btn" data-act="review">Start review${due.length>8?" (8 at a time)":""}</button>`:""}
+  </section>
+  <section class="card">
+    <span class="label">Memory boxes · ${total} questions</span>
+    <div class="boxes">${counts.map((c,b)=>`<div><span class="label" style="font-size:10px">${c}</span><i style="height:${Math.round(c/max*52)}px;opacity:${.35+b*.1}"></i></div>`).join("")}</div>
+    <div class="boxes" style="height:auto">${BOX_DAYS.map(d=>`<div><span class="label" style="font-size:10px">${d}d</span></div>`).join("")}</div>
+    <p class="note">Each box is a review gap. Questions climb from 1 day to 60 days as you keep remembering them.</p>
+  </section>`;
+}
+
+/* ---------- Bank ---------- */
+function viewBank(){
+  if(viewLesson){ const l=L[viewLesson];
+    return `<button class="back" data-act="closebank">← Knowledge bank</button><article class="card">${lessonBody(l)}<span class="label">Learned ${parse(l.learnedOn).toLocaleDateString(undefined,{day:"numeric",month:"long",year:"numeric"})}</span></article>`; }
+  const all=Object.values(L).sort((a,b)=>a.learnedOn<b.learnedOn?1:a.learnedOn>b.learnedOn?-1:0);
+  const subs=["All",...new Set(all.map(l=>l.subject))];
+  const q=bankQ.toLowerCase();
+  const list=all.filter(l=>(bankF==="All"||l.subject===bankF)&&(!q||(l.title+" "+l.takeaway+" "+l.body.join(" ")).toLowerCase().includes(q)));
+  if(!all.length) return `<div class="empty"><span class="label">Your knowledge bank</span><h3 style="font-size:20px">Nothing here yet</h3><p class="note">Every lesson you finish is filed here with its key takeaway, so you can search and reread it any time.</p><button class="btn" data-tab-go="today">Go to today's lesson</button></div>`;
+  return `<section style="display:flex;flex-direction:column;gap:6px"><span class="label">${all.length} lesson${all.length>1?"s":""} · ${subs.length-1} subject${subs.length>2?"s":""}</span><h2 style="font-size:26px">Knowledge bank</h2></section>
+   <input class="search" id="bankq" type="search" placeholder="Search what you've learned" value="${esc(bankQ)}" aria-label="Search lessons">
+   <div class="filters">${subs.map(s=>`<button class="topic" data-filter="${esc(s)}" aria-pressed="${bankF===s}">${esc(s)}</button>`).join("")}</div>
+   <div class="list">${list.length?list.map(l=>`<button class="item" data-open="${l.id}"><div class="meta">${chip(l.subject)}<span class="label">${parse(l.learnedOn).toLocaleDateString(undefined,{day:"numeric",month:"short"})}</span></div><h3>${esc(l.title)}</h3><p>${esc(l.takeaway)}</p></button>`).join(""):`<p class="note">No lessons match “${esc(bankQ)}”.</p>`}</div>`;
+}
+
+/* ---------- Claude-written lessons ---------- */
+async function generate(){
+  if(gen.busy) return;
+  const sample = await window.claude?.use?.("sample").catch(()=>null);
+  if(!sample){ gen.err="Writing new lessons needs Claude, which isn't available in this view. Open the page in the Claude app."; render(); return; }
+  gen={busy:true,err:"",ctl:new AbortController()}; render();
+  const learned=Object.values(L);
+  const recent=learned.sort((a,b)=>a.learnedOn<b.learnedOn?1:-1).slice(0,4).map(l=>l.subject);
+  const topics=P.interests.length?P.interests:SUBJECTS;
+  const prompt=`Write ONE bite-sized daily lesson for an adult's "learn one thing a day" app, like Duolingo for general knowledge.
+Choose the subject from: ${topics.join(", ")}. Prefer a subject not in this recent list: ${recent.join(", ")||"none"}.
+Do not repeat any of these already-covered lessons: ${learned.map(l=>l.title).join("; ")||"none"}.
+Pick a fact or idea that is genuinely surprising or useful, and that you are certain is accurate. No myths; if a popular claim is disputed, say so.
+Write plainly for a curious adult. Body: exactly 3 short paragraphs, 130-170 words total. Takeaway: one sentence.
+Then 3 multiple-choice questions that test the lesson, each with 4 options, one correct; vary which position is correct; "why" is one short sentence.
+Reply with only JSON in this shape:
+{"subject":"one of the listed subjects","title":"short title","body":["p1","p2","p3"],"takeaway":"...","questions":[{"q":"...","options":["a","b","c","d"],"answer":0,"why":"..."}]}`;
+  try{
+    const r = await sample.json(prompt,{signal:gen.ctl.signal,cache:false});
+    const qs=(r?.questions||[]).filter(q=>q&&q.q&&Array.isArray(q.options)&&q.options.length>=2&&Number.isInteger(q.answer)&&q.answer<q.options.length)
+      .slice(0,3).map(q=>({q:String(q.q),o:q.options.map(String),a:q.answer,why:String(q.why||"")}));
+    if(!r?.title||!Array.isArray(r.body)||!r.body.length||!qs.length) throw {code:"invalid_json"};
+    const l={id:"g"+Date.now().toString(36),subject:String(r.subject||topics[0]),title:String(r.title),body:r.body.map(String).slice(0,4),takeaway:String(r.takeaway||""),qs,generated:true};
+    gen={busy:false,err:"",ctl:null};
+    P.pending=l;
+    if(!doneToday()){ P.todayDate=TODAY(); P.todayId=l.id; }
+    await saveProgress();
+    if(doneToday()) showReader(l); else { render(); scrollTo(0,0); }
+  }catch(e){
+    const code=e?.code;
+    gen={busy:false,ctl:null,err: code==="cancelled"?"":
+      code==="not_granted"||code==="sampling_disabled"?"Claude wasn't allowed for this page, so it can't write lessons here.":
+      code==="rate_limited"?"You've hit a usage limit. Try again a little later.":
+      code==="invalid_json"?"The lesson came back malformed. Try again.":
+      "Couldn't reach Claude just now. Try again."};
+    render();
+  }
+}
+function showReader(l){
+  S=null; tab="today";
+  $("#app").innerHTML = header() + `<article class="card">${lessonBody(l)}<button class="btn" data-act="quizbonus" data-id="${l.id}">Take the 3-question quiz</button></article>`;
+  renderTabs(); bind(); scrollTo(0,0);
+}
+
+/* ---------- events ---------- */
+function bind(){
+  document.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>{ tab=b.dataset.tab; if(S&&S.finished) S=null; viewLesson=null; render(); scrollTo(0,0); });
+  document.querySelectorAll("[data-tab-go]").forEach(b=>b.onclick=()=>{ tab=b.dataset.tabGo; S=null; render(); scrollTo(0,0); });
+  document.querySelectorAll("[data-pick]").forEach(b=>b.onclick=()=>pick(+b.dataset.pick));
+  document.querySelectorAll("[data-topic]").forEach(b=>b.onclick=()=>{ const s=b.dataset.topic; P.interests=P.interests.includes(s)?P.interests.filter(x=>x!==s):[...P.interests,s]; saveProgress(); b.setAttribute("aria-pressed",P.interests.includes(s)); });
+  document.querySelectorAll("[data-filter]").forEach(b=>b.onclick=()=>{ bankF=b.dataset.filter; render(); });
+  document.querySelectorAll("[data-open]").forEach(b=>b.onclick=()=>{ viewLesson=b.dataset.open; render(); scrollTo(0,0); });
+  const sq=$("#bankq"); if(sq){ sq.oninput=()=>{ bankQ=sq.value; const pos=sq.selectionStart; render(); const n=$("#bankq"); n.focus(); n.setSelectionRange(pos,pos); }; }
+  document.querySelectorAll("[data-act]").forEach(b=>b.onclick=()=>{
+    const a=b.dataset.act;
+    if(a==="quiz") startLesson(todaysLesson(),false);
+    else if(a==="bonus"){ const l=LIB.find(x=>x.id===b.dataset.id); showReader(l); }
+    else if(a==="quizbonus"){ startLesson(byId(b.dataset.id),doneToday()); }
+    else if(a==="next") next();
+    else if(a==="done"){ S=null; render(); scrollTo(0,0); }
+    else if(a==="quit"){ const l=S.kind==="lesson"&&S.bonus?S.lesson:null; S=null; if(l) showReader(l); else render(); }
+    else if(a==="review") startReview();
+    else if(a==="gen") generate();
+    else if(a==="stopgen") gen.ctl?.abort();
+    else if(a==="closebank"){ viewLesson=null; render(); }
+  });
+}
+document.addEventListener("keydown",e=>{
+  if(!S||S.finished||e.target.tagName==="INPUT") return;
+  const k="abcd".indexOf(e.key.toLowerCase());
+  if(S.picked==null && k>=0 && k<4) { const q=byId(S.items[S.i].id).qs[S.items[S.i].qi]; if(k<q.o.length) pick(k); }
+  else if(S.picked!=null && e.key==="Enter") next();
+});
+
+/* first frame from the library, then load saved progress */
+render();
+initStore().then(()=>{ ready=true; if(!S) render(); else renderTabs(); });
+</script>
+</body>
+</html>
