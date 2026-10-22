@@ -12,7 +12,17 @@ import { appUrl } from "../lib/share";
 import { useGame, type SessionResult } from "../lib/useGame";
 import type { Lesson } from "../lib/types";
 
-const digDeeper = (l: Lesson) => `https://en.wikipedia.org/w/index.php?search=${encodeURIComponent(l.title)}`;
+/** "Wikipedia: Rayleigh scattering" for Wikipedia links, otherwise the site's host name. */
+export function sourceLabel(url: string): string {
+  try {
+    const u = new URL(url);
+    if (u.hostname.endsWith("wikipedia.org") && u.pathname.startsWith("/wiki/"))
+      return `Wikipedia: ${decodeURIComponent(u.pathname.slice(6)).replace(/_/g, " ")}`;
+    return u.hostname.replace(/^www\./, "");
+  } catch {
+    return url;
+  }
+}
 
 export function LessonBody({ lesson }: { lesson: Lesson }) {
   const { state } = useGame();
@@ -35,10 +45,19 @@ export function LessonBody({ lesson }: { lesson: Lesson }) {
         <span className="label">Remember this</span>
         <p>{lesson.takeaway}</p>
       </div>
-      {!isChild(state.settings) && (
-        <a className="rabbit" href={digDeeper(lesson)} target="_blank" rel="noopener noreferrer">
-          Read more on Wikipedia ↗
-        </a>
+      {!isChild(state.settings) && lesson.sources.length > 0 && (
+        <div className="sources">
+          <span className="label">Read more</span>
+          <ul>
+            {lesson.sources.map((s) => (
+              <li key={s}>
+                <a className="rabbit" href={s} target="_blank" rel="noopener noreferrer">
+                  {sourceLabel(s)} ↗
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
     </>
   );

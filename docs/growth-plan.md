@@ -5,7 +5,7 @@ October 2026. A working plan, not a forecast. Numbers from outside sources are m
 ## The short version
 
 1. **The daily question is the main sharing mechanism.** Everyone gets the same question, anyone can answer it from a link without signing up, and the result can be shared without giving the answer away. That's the loop that made Wordle spread. It's built.
-2. **The biggest risk is running out of lessons, not growth.** There are 21 lessons. Someone learning 4 days a week finishes them in about 5 weeks. Get to 100 before any push for attention.
+2. **The biggest risk is running out of lessons, not growth.** There are now 100 lessons, each with a source and a simpler version: roughly six months for someone learning 4 days a week. Keep adding more steadily, and fact-check each one.
 3. **The clearest gap in the market is families.** A parent and a child can take the same lesson at two reading levels and talk about it. Duolingo doesn't do that, and it's a reason for adults to tell other adults about the app.
 4. **Accounts for under-13s are a legal project.** The US COPPA rule changed in 2025. Keep children's use account-free, or parent-managed, until that work is done.
 
@@ -63,7 +63,7 @@ Ordered by value for the effort. ✓ means it's done.
 - ✓ Link previews (Open Graph image and text)
 
 **Next (before telling anyone)**
-1. **More lessons: 21 → 100,** each with a simpler version and at least one source. Add a `sources` field to lessons and show it under "Read more". Fact-check every lesson. A single wrong fact going viral is the worst outcome for a learning app.
+1. ✓ **100 lessons,** each with a simpler version and at least one source shown under "Read more". Next: have a second person fact-check each lesson against its sources. A single wrong fact going viral is the worst outcome for a learning app.
 2. **Share as an image,** not just text. Draw the fact card or daily result onto a canvas and share the PNG. Instagram and TikTok stories need images.
 3. **A page per lesson** (e.g. `/lessons/why-the-sky-is-blue/`) built at deploy time, with its own link preview. Today everything sits behind `#/` routes, so search engines and link previews only see the home page.
 4. **Privacy-friendly counting** with no cookies and no personal data. That means a tool like Plausible, or a self-built counter. Track: daily-link visits, daily answers, share taps, and how many link visitors start onboarding. Leave it off in under-13 mode.
@@ -77,7 +77,7 @@ Ordered by value for the effort. ✓ means it's done.
 
 ## Launch sequence
 
-1. **Seed the content (weeks 1–4).** Reach 100 lessons. Each lesson is also a 30-second video script: open with the surprising fact, then "the answer's in Geek.me" at the end. Post 3–5 a week from a Geek.me account before launching anything.
+1. **Seed the content (weeks 1–4).** Keep adding lessons. Each lesson is also a 30-second video script: open with the surprising fact, then "the answer's in Geek.me" at the end. Post 3–5 a week from a Geek.me account before launching anything.
 2. **Daily question in public (week 3 on).** Post the daily question as a poll on social each morning, linking to `#/daily`. This tests the loop with no spend.
 3. **Small launches (weeks 5–6).** Use Product Hunt, a Show HN-style post, and two or three relevant subreddits. Read each subreddit's rules first: large ones such as r/todayilearned restrict self-promotion.
 4. **Families and teachers (weeks 6–10).** Contact a handful of parenting and teacher creators. Give them the two-level lesson angle and a free class or family circle once accounts exist.

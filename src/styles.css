@@ -1089,3 +1089,17 @@ button {
 .fact-card > .btn {
   margin-top: 4px;
 }
+
+.sources {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.sources ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}

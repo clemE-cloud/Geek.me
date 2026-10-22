@@ -6,6 +6,14 @@ export interface Question {
   why: string;
 }
 
+/** The parts of a lesson that change with reading level. */
+export interface LessonVersion {
+  title?: string;
+  body: string[];
+  takeaway: string;
+  qs: Question[];
+}
+
 export interface Lesson {
   id: string;
   subject: string;
@@ -13,14 +21,22 @@ export interface Lesson {
   body: string[];
   takeaway: string;
   qs: Question[];
+  /** Simpler version for about ages 6–12, with the same number of questions. */
+  young: LessonVersion;
+  /** Where the facts come from. Shown as links to readers aged 13 and up. */
+  sources: string[];
+  /** Indexes of questions that make sense without reading the lesson, usable as the daily question. */
+  daily?: number[];
 }
 
-/** The parts of a lesson that change with reading level. */
-export interface LessonVersion {
-  title?: string;
-  body: string[];
-  takeaway: string;
-  qs: Question[];
+/** A constellation and its lessons, kept together in one file under src/data/packs/. */
+export interface Pack {
+  id: string;
+  name: string;
+  theme: string;
+  blurb: string;
+  /** In the order they unlock. */
+  lessons: Lesson[];
 }
 
 export interface Constellation {

@@ -34,11 +34,15 @@ npm run preview    # serve the production build
 
 ## Add a lesson
 
-1. Open `src/data/lessons.ts` and append a lesson. The comment at the top shows the format.
-2. Add a simpler version with the same `id` to `src/data/lessons-young.ts`. Use short sentences, everyday words and 3 options per question, and keep the same number of questions.
-3. Add its `id` to a constellation in `src/data/constellations.ts`. Its position in that list decides where it appears on the map.
-4. If any of its questions make sense without reading the lesson first, add them to `DAILY_POOL` in `src/lib/content.ts`.
-5. Run `npm test`. It checks that every lesson is in exactly one constellation, that every lesson has a simpler version, that answer indexes are valid, and that the simpler sentences stay short.
+There are 100 lessons in 13 constellations. Each constellation has its own file in `src/data/packs/`, and each lesson keeps its standard version, its simpler version for ages 6–12 and its sources together.
+
+1. Open the pack you want, e.g. `src/data/packs/diver.ts`, and append a lesson to `lessons`. The comment at the top of `src/data/packs/index.ts` shows the format.
+2. Write the simpler version in the lesson's `young` field. Use short sentences, everyday words and 3 options per question, and keep the same number of questions.
+3. Add at least one source link, and fact-check the lesson against it.
+4. If any question makes sense without reading the lesson first, list its index in `daily` so it can be a daily question.
+5. Run `npm test`. It checks that ids are unique, every lesson has a source, a simpler version and 3 questions with valid answers, lessons stay short, the simpler sentences stay under 25 words, and right answers aren't all in the same position.
+
+Lessons unlock in the order they appear in their pack. To add a new constellation, copy one of the pack files and add it to `PACKS` in `src/data/packs/index.ts`.
 
 Don't change or reuse an `id` once it's published, because saved progress uses it.
 
@@ -52,7 +56,7 @@ The app is at `https://<your-username>.github.io/<repo-name>/`. If it doesn't ap
 
 ```
 src/
-  data/        lessons (standard and young), constellations
+  data/packs/  the lessons, one file per constellation
   lib/         game rules and content selection (pure, unit-tested), dates, storage, sharing, state hook, router
   components/  shell, quiz, star map, meters, results
   screens/     onboarding, today, sky, lesson, review, collection, circles, profile

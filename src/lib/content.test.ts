@@ -1,31 +1,68 @@
 import { describe, expect, it } from "vitest";
 import { LESSONS } from "../data/lessons";
-import { YOUNG } from "../data/lessons-young";
 import { DAILY_EPOCH, DAILY_POOL, dailyItem, dailyNumber, defaultsForAge, isChild, lessonView } from "./content";
 import { addDays } from "./dates";
 import { answerDaily, freshState } from "./game";
 
-describe("young lessons", () => {
-  it("exist for every lesson, with the same number of questions and valid answers", () => {
-    expect(Object.keys(YOUNG).sort()).toEqual(LESSONS.map((l) => l.id).sort());
+describe("lesson library", () => {
+  it("has 100 lessons with unique ids", () => {
+    expect(LESSONS.length).toBe(100);
+    expect(new Set(LESSONS.map((l) => l.id)).size).toBe(LESSONS.length);
+  });
+
+  it("gives every lesson at least one https source", () => {
     for (const l of LESSONS) {
-      const y = YOUNG[l.id];
-      expect(y.qs.length, l.id).toBe(l.qs.length);
-      for (const q of y.qs) {
+      expect(l.sources.length, l.id).toBeGreaterThan(0);
+      for (const s of l.sources) expect(s, l.id).toMatch(/^https:\/\//);
+    }
+  });
+
+  it("uses 3 questions with 4 options and valid answers", () => {
+    for (const l of LESSONS) {
+      expect(l.qs.length, l.id).toBe(3);
+      for (const q of l.qs) {
+        expect(q.o.length, `${l.id}: ${q.q}`).toBe(4);
+        expect(q.a).toBeLessThan(q.o.length);
+      }
+    }
+  });
+
+  it("keeps lessons short", () => {
+    for (const l of LESSONS) {
+      const words = l.body.join(" ").split(/\s+/).length;
+      expect(words, l.id).toBeGreaterThanOrEqual(75);
+      expect(words, l.id).toBeLessThanOrEqual(230);
+    }
+  });
+
+  it("doesn't put every right answer in the same slot", () => {
+    for (const l of LESSONS) {
+      expect(new Set(l.qs.map((q) => q.a)).size, l.id).toBeGreaterThan(1);
+      expect(new Set(l.young.qs.map((q) => q.a)).size, `${l.id} young`).toBeGreaterThan(1);
+    }
+  });
+
+  it("marks only real questions for the daily pool", () => {
+    for (const l of LESSONS) for (const qi of l.daily ?? []) expect(l.qs[qi], l.id).toBeDefined();
+  });
+});
+
+describe("young lessons", () => {
+  it("have the same number of questions, with 3 options each", () => {
+    for (const l of LESSONS) {
+      expect(l.young.qs.length, l.id).toBe(l.qs.length);
+      for (const q of l.young.qs) {
         expect(q.o.length, `${l.id}: ${q.q}`).toBe(3);
         expect(q.a).toBeLessThan(q.o.length);
       }
     }
   });
 
-  it("don't put every right answer in the same slot", () => {
-    for (const l of LESSONS) expect(new Set(YOUNG[l.id].qs.map((q) => q.a)).size, l.id).toBeGreaterThan(1);
-  });
-
   it("keep sentences short", () => {
-    for (const [id, y] of Object.entries(YOUNG))
-      for (const p of y.body)
-        for (const sentence of p.split(/(?<=[.!?])\s+/)) expect(sentence.split(/\s+/).length, `${id}: ${sentence}`).toBeLessThanOrEqual(24);
+    for (const l of LESSONS)
+      for (const p of l.young.body)
+        for (const sentence of p.split(/(?<=[.!?][’'"”]?)\s+/))
+          expect(sentence.split(/\s+/).length, `${l.id}: ${sentence}`).toBeLessThanOrEqual(24);
   });
 
   it("are used only at the young level", () => {
