@@ -6,12 +6,21 @@ import type { Constellation, GameState, Lesson, QuizItem } from "./types";
 export const FOCUS_MAX = 5;
 /** Days until a question comes back, by Leitner box. */
 export const BOX_DAYS = [1, 2, 4, 7, 15, 30, 60];
-export const XP = { lesson: 10, lessonCorrect: 5, review: 3, practice: 1 };
+export const XP = { lesson: 10, lessonCorrect: 5, review: 3, practice: 1, daily: 5 };
 export const REVIEW_BATCH = 8;
 
 export const freshState = (): GameState => ({
   version: 1,
-  settings: { name: "", daysPerWeek: 4, dailyGoal: 30, onboarded: false },
+  settings: {
+    name: "",
+    age: null,
+    level: "standard",
+    look: "calm",
+    textSize: "normal",
+    daysPerWeek: 4,
+    dailyGoal: 30,
+    onboarded: false,
+  },
   xp: 0,
   xpByDay: {},
   learned: {},
@@ -20,6 +29,7 @@ export const freshState = (): GameState => ({
   perfectLessons: 0,
   reviewsCorrect: 0,
   achievements: {},
+  daily: {},
 });
 
 /* ---------- lessons and the map ---------- */
@@ -150,6 +160,13 @@ export function completeReview(s: GameState, items: QuizItem[], results: boolean
   return { state: { ...addXp(s, t, gained), cards, reviewsCorrect: s.reviewsCorrect + right }, gained };
 }
 
+/** The daily question can be answered once per day; a right answer earns a little XP. */
+export function answerDaily(s: GameState, t: string, correct: boolean): GameState {
+  if (t in s.daily) return s;
+  const next = { ...s, daily: { ...s.daily, [t]: correct } };
+  return correct ? addXp(next, t, XP.daily) : next;
+}
+
 /* ---------- achievements ---------- */
 
 export interface Achievement {
@@ -169,7 +186,8 @@ export const ACHIEVEMENTS: Achievement[] = [
   { id: "steady", title: "Steady", desc: "Hit your rhythm 3 weeks in a row", glyph: "♫", test: (s, t) => rhythmWeeks(s, t) >= 3 },
   { id: "join-dots", title: "Join the dots", desc: "Complete a constellation", glyph: "⟡", test: (s) => CONSTELLATIONS.some((c) => isComplete(s, c)) },
   { id: "recall", title: "Total recall", desc: "Answer 25 review questions right", glyph: "↻", test: (s) => s.reviewsCorrect >= 25 },
-  { id: "xp-250", title: "Quarter grand", desc: "Earn 250 XP", glyph: "⚡", test: (s) => s.xp >= 250 },
+  { id: "daily-5", title: "Regular", desc: "Answer 5 daily questions", glyph: "☾", test: (s) => Object.keys(s.daily).length >= 5 },
+  { id: "xp-250", title: "250 XP", desc: "Earn 250 XP", glyph: "⚡", test: (s) => s.xp >= 250 },
   { id: "full-sky", title: "Full sky", desc: "Finish every lesson", glyph: "☼", test: (s) => allLearned(s) },
 ];
 

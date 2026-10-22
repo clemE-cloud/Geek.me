@@ -2,6 +2,7 @@ import { StarMap } from "../components/StarMap";
 import { IconCheck, IconLock } from "../components/Icons";
 import { CONSTELLATIONS } from "../data/constellations";
 import { LESSONS, lessonById } from "../data/lessons";
+import { lessonView } from "../lib/content";
 import { constellationProgress, isLearned, isUnlocked } from "../lib/game";
 import { go } from "../lib/router";
 import { useGame } from "../lib/useGame";
@@ -16,7 +17,8 @@ export function Sky() {
       <div>
         <h1>Your sky</h1>
         <p className="note">
-          {lit} of {LESSONS.length} stars lit. Start any constellation; each one unlocks star by star.
+          {lit} of {LESSONS.length} lessons done. Each group of stars is a topic. Start any of them; the next star opens when you
+          finish one.
         </p>
       </div>
 
@@ -35,7 +37,7 @@ export function Sky() {
             <StarMap c={c} state={state} onPick={pick} />
             <ol className="star-list">
               {c.lessons.map((id) => {
-                const l = lessonById(id);
+                const l = lessonView(id, state.settings.level);
                 if (!l) return null;
                 const learned = isLearned(state, id);
                 const open = isUnlocked(state, c, id);

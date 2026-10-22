@@ -4,6 +4,7 @@ import { IconClose } from "../components/Icons";
 import { CONSTELLATIONS } from "../data/constellations";
 import { lessonById } from "../data/lessons";
 import { fmt } from "../lib/dates";
+import { lessonView } from "../lib/content";
 import { ACHIEVEMENTS, isComplete, isLearned } from "../lib/game";
 import { go } from "../lib/router";
 import type { Lesson } from "../lib/types";
@@ -21,7 +22,7 @@ export function Collection() {
     !query || (isLearned(state, l.id) && `${l.title} ${l.takeaway} ${l.body.join(" ")}`.toLowerCase().includes(query));
   const groups = CONSTELLATIONS.map((c) => ({
     c,
-    cards: c.lessons.map((id) => lessonById(id)).filter((l): l is Lesson => !!l && matches(l)),
+    cards: c.lessons.map((id) => lessonView(id, state.settings.level)).filter((l): l is Lesson => !!l && matches(l)),
   })).filter((g) => g.cards.length);
 
   return (
@@ -96,7 +97,7 @@ export function Collection() {
 
 export function CardView({ id }: { id: string }) {
   const { state } = useGame();
-  const lesson = lessonById(id);
+  const lesson = lessonView(id, state.settings.level);
   if (!lesson || !isLearned(state, id)) {
     return (
       <div className="stack">

@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import type { Achievement } from "../lib/game";
 import type { Lesson } from "../lib/types";
 import { Chip } from "./Bits";
@@ -10,10 +11,11 @@ interface Props {
   earned: Achievement[];
   card?: Lesson;
   note: string;
+  share?: ReactNode;
   onContinue: () => void;
 }
 
-export function Result({ title, gained, right, total, earned, card, note, onContinue }: Props) {
+export function Result({ title, gained, right, total, earned, card, note, share, onContinue }: Props) {
   return (
     <section className="result">
       <span className="label">{title}</span>
@@ -30,6 +32,7 @@ export function Result({ title, gained, right, total, earned, card, note, onCont
           </div>
           <h3>{card.title}</h3>
           <p>{card.takeaway}</p>
+          {share}
         </div>
       )}
 

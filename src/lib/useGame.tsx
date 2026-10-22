@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { today } from "./dates";
-import { answerFocus, awardAchievements, completeLesson, completeReview, freshState, type Achievement } from "./game";
+import { answerDaily, answerFocus, awardAchievements, completeLesson, completeReview, freshState, type Achievement } from "./game";
 import { localStore, type ProgressStore } from "./storage";
 import type { GameState, Lesson, QuizItem, Settings } from "./types";
 
@@ -16,6 +16,7 @@ interface GameApi {
   answer(kind: "lesson" | "review", correct: boolean): void;
   finishLesson(lesson: Lesson, results: boolean[]): SessionResult;
   finishReview(items: QuizItem[], results: boolean[]): SessionResult;
+  finishDaily(correct: boolean): SessionResult;
   updateSettings(patch: Partial<Settings>): void;
   reset(): Promise<void>;
 }
@@ -73,6 +74,13 @@ export function GameProvider({ children, store = localStore }: { children: React
         const award = awardAchievements(done.state, t);
         commit(award.state);
         return { gained: done.gained, earned: award.earned };
+      },
+      finishDaily(correct) {
+        const t = today();
+        const before = ref.current.xp;
+        const award = awardAchievements(answerDaily(ref.current, t, correct), t);
+        commit(award.state);
+        return { gained: award.state.xp - before, earned: award.earned };
       },
       updateSettings(patch) {
         commit({ ...ref.current, settings: { ...ref.current.settings, ...patch } });

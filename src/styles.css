@@ -54,6 +54,56 @@
   }
 }
 
+/* Bright look: always light, rounder and bolder. The default for ages 6–9. */
+:root[data-look="bright"] {
+  --bg: #fff8e8;
+  --surface: #ffffff;
+  --surface-2: #fff2d4;
+  --ink: #1f2340;
+  --muted: #565b78;
+  --line: #f0deb0;
+  --accent: #ffb020;
+  --accent-ink: #2a1a00;
+  --accent-soft: rgba(255, 176, 32, 0.18);
+  --ok: #1d8049;
+  --ok-soft: rgba(29, 128, 73, 0.12);
+  --bad: #cc3f25;
+  --bad-soft: rgba(204, 63, 37, 0.1);
+  --h1: #2563eb;
+  --h2: #d0337a;
+  --h3: #12855a;
+  --h4: #b35c00;
+  --h5: #7c3aed;
+  --h6: #0e7f99;
+  --shadow: 0 2px 0 #f0deb0, 0 10px 24px -18px rgba(80, 50, 0, 0.4);
+  --radius: 24px;
+  --display: "Nunito", system-ui, sans-serif;
+  --serif: "Nunito", system-ui, sans-serif;
+  --sans: "Nunito", system-ui, sans-serif;
+  color-scheme: light;
+}
+:root[data-look="bright"] body::before {
+  opacity: 0.12;
+}
+:root[data-look="bright"] .prose {
+  font-weight: 500;
+}
+:root[data-look="bright"] h1,
+:root[data-look="bright"] h2,
+:root[data-look="bright"] h3 {
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+:root[data-look="bright"] .btn {
+  border-radius: 18px;
+  font-weight: 800;
+}
+
+/* Large text: scales the whole interface, so tap targets grow too. */
+:root[data-text="large"] body {
+  zoom: 1.15;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -481,7 +531,7 @@ button {
 }
 .week {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  grid-template-columns: repeat(7, minmax(0, 1fr));
   gap: 4px;
   max-width: 260px;
 }
@@ -492,8 +542,9 @@ button {
   gap: 3px;
 }
 .dot {
-  width: 24px;
-  height: 24px;
+  width: 100%;
+  max-width: 24px;
+  aspect-ratio: 1;
   border-radius: 50%;
   border: 1.5px solid var(--line);
   display: grid;
@@ -1006,4 +1057,35 @@ button {
     animation: none !important;
     transition: none !important;
   }
+}
+
+/* ---------- additions: daily question, actions, age choices ---------- */
+.choices.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+}
+.choices.grid .choice {
+  align-items: center;
+  text-align: center;
+  font-size: 18px;
+}
+.small-btn {
+  min-height: 38px;
+  padding: 0 14px;
+  font-size: 14px;
+}
+.ok-text {
+  color: var(--ok);
+}
+.bad-text {
+  color: var(--bad);
+}
+.daily {
+  border-top: 3px solid var(--accent);
+}
+.daily .q {
+  margin-top: 0;
+}
+.fact-card > .btn {
+  margin-top: 4px;
 }

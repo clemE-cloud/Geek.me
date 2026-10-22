@@ -1,19 +1,23 @@
 import { useState } from "react";
+import { ListenButton, ShareButton } from "../components/Actions";
 import { Chip } from "../components/Bits";
 import { IconClose } from "../components/Icons";
 import { Quiz } from "../components/Quiz";
 import { Result } from "../components/Result";
 import { constellationOf } from "../data/constellations";
-import { lessonById } from "../data/lessons";
+import { isChild, lessonView } from "../lib/content";
 import { isLearned, isUnlocked } from "../lib/game";
 import { go } from "../lib/router";
+import { appUrl } from "../lib/share";
 import { useGame, type SessionResult } from "../lib/useGame";
 import type { Lesson } from "../lib/types";
 
-export const digDeeper = (l: Lesson) => `https://en.wikipedia.org/w/index.php?search=${encodeURIComponent(l.title)}`;
+const digDeeper = (l: Lesson) => `https://en.wikipedia.org/w/index.php?search=${encodeURIComponent(l.title)}`;
 
 export function LessonBody({ lesson }: { lesson: Lesson }) {
+  const { state } = useGame();
   const c = constellationOf(lesson.id);
+  const young = state.settings.level === "young";
   return (
     <>
       <div className="meta">
@@ -21,6 +25,7 @@ export function LessonBody({ lesson }: { lesson: Lesson }) {
         {c && <span className="label">{c.name}</span>}
       </div>
       <h1 className="lesson-title">{lesson.title}</h1>
+      <ListenButton text={[lesson.title, ...lesson.body, lesson.takeaway].join(" ")} slow={young} />
       <div className="prose">
         {lesson.body.map((p, i) => (
           <p key={i}>{p}</p>
@@ -30,9 +35,11 @@ export function LessonBody({ lesson }: { lesson: Lesson }) {
         <span className="label">Remember this</span>
         <p>{lesson.takeaway}</p>
       </div>
-      <a className="rabbit" href={digDeeper(lesson)} target="_blank" rel="noopener noreferrer">
-        Down the rabbit hole: read more on Wikipedia ↗
-      </a>
+      {!isChild(state.settings) && (
+        <a className="rabbit" href={digDeeper(lesson)} target="_blank" rel="noopener noreferrer">
+          Read more on Wikipedia ↗
+        </a>
+      )}
     </>
   );
 }
@@ -41,7 +48,7 @@ export function LessonPlayer({ id }: { id: string }) {
   const { state, finishLesson } = useGame();
   const [phase, setPhase] = useState<"read" | "quiz" | "done">("read");
   const [outcome, setOutcome] = useState<(SessionResult & { results: boolean[] }) | null>(null);
-  const lesson = lessonById(id);
+  const lesson = lessonView(id, state.settings.level);
   const c = lesson && constellationOf(lesson.id);
 
   if (!lesson || !c) {
@@ -66,6 +73,7 @@ export function LessonPlayer({ id }: { id: string }) {
         card={lesson}
         note="These questions will come back in Review: right ones in 2 days, missed ones tomorrow."
         onContinue={() => go("today")}
+        share={<ShareButton text={`Today I learned: ${lesson.takeaway}`} url={appUrl()} />}
       />
     );
   }

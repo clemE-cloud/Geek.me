@@ -68,7 +68,7 @@ export function Review() {
               {due.length} question{due.length > 1 ? "s" : ""} ready
             </h2>
             <p className="note">
-              Answer from memory. Right answers come back later and later; missed ones come back tomorrow.
+              Answer from memory. Questions you get right come back after a longer gap. Ones you miss come back tomorrow.
             </p>
             <button className="btn" onClick={() => setSession({ items: due.slice(0, REVIEW_BATCH), practice: false })}>
               Start review{due.length > REVIEW_BATCH ? ` (${REVIEW_BATCH} at a time)` : ""}
@@ -103,8 +103,8 @@ export function Review() {
         </div>
         <p className="note">
           {state.focus < FOCUS_MAX
-            ? "Wrong answers in a new lesson cost focus. Every right answer here earns it back. No timers, no paying."
-            : "Focus is full. Wrong answers in new lessons use it up; right answers here refill it."}
+            ? "Wrong answers in a new lesson cost 1 focus. Each right answer here gives 1 back."
+            : "Focus is full. Wrong answers in new lessons use it up, and right answers here refill it."}
         </p>
       </section>
 

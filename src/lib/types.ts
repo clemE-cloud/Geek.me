@@ -15,6 +15,14 @@ export interface Lesson {
   qs: Question[];
 }
 
+/** The parts of a lesson that change with reading level. */
+export interface LessonVersion {
+  title?: string;
+  body: string[];
+  takeaway: string;
+  qs: Question[];
+}
+
 export interface Constellation {
   id: string;
   name: string;
@@ -30,8 +38,18 @@ export interface ReviewCard {
   due: string;
 }
 
+export type AgeBand = "6-9" | "10-12" | "13-17" | "18-64" | "65+";
+/** "young" = simpler lessons for about 6–12; "standard" for everyone else. */
+export type Level = "young" | "standard";
+export type Look = "calm" | "bright";
+export type TextSize = "normal" | "large";
+
 export interface Settings {
   name: string;
+  age: AgeBand | null;
+  level: Level;
+  look: Look;
+  textSize: TextSize;
   /** Target active days per week: the "rhythm". */
   daysPerWeek: number;
   /** Daily XP goal. */
@@ -54,6 +72,8 @@ export interface GameState {
   reviewsCorrect: number;
   /** Achievement id -> date earned. */
   achievements: Record<string, string>;
+  /** Daily question results: date -> answered correctly. */
+  daily: Record<string, boolean>;
 }
 
 export interface QuizItem {

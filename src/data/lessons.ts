@@ -463,7 +463,7 @@ export const LESSONS: Lesson[] = [
     title: "You're always seeing the past",
     body: [
       "Light is fast, about 300,000 km per second, but not instant. Sunlight takes roughly 8 minutes and 20 seconds to reach Earth. If the Sun vanished, you wouldn't know for over eight minutes.",
-      "The nearest star after the Sun, Proxima Centauri, is about 4.24 light-years away. The light you'd see from it left before you saw it, over four years ago. Light from the Andromeda Galaxy set off about 2.5 million years ago.",
+      "The nearest star after the Sun, Proxima Centauri, is about 4.24 light-years away. The light you see from it left the star more than four years ago. Light from the Andromeda Galaxy set off about 2.5 million years ago.",
       "Looking out into space is looking back in time. That's how astronomers study the early universe: the most distant galaxies show us how things were billions of years ago.",
     ],
     takeaway: "Light takes time to travel, so everything you see in the sky is how it was, not how it is.",

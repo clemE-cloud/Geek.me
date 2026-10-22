@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+import { Daily } from "./components/Daily";
 import { Shell } from "./components/Shell";
 import { useRoute } from "./lib/router";
 import { useGame } from "./lib/useGame";
@@ -13,8 +15,26 @@ import { Today } from "./screens/Today";
 export function App() {
   const { state, ready } = useGame();
   const [page = "today", arg = ""] = useRoute();
+  const { look, textSize } = state.settings;
+
+  useEffect(() => {
+    document.documentElement.dataset.look = look;
+    document.documentElement.dataset.text = textSize;
+  }, [look, textSize]);
 
   if (!ready) return <div className="splash" aria-busy="true" />;
+
+  // Shared daily-question links work before onboarding, so a friend can answer straight away.
+  if (page === "daily" && !state.settings.onboarded) {
+    return (
+      <main className="wrap solo stack">
+        <a className="brand" href="#/">
+          Geek<span>.me</span>
+        </a>
+        <Daily standalone />
+      </main>
+    );
+  }
   if (!state.settings.onboarded) return <Onboarding />;
 
   if (page === "lesson") {
@@ -27,6 +47,7 @@ export function App() {
 
   const screens: Record<string, [string, JSX.Element]> = {
     today: ["today", <Today />],
+    daily: ["today", <Daily standalone />],
     sky: ["sky", <Sky />],
     review: ["review", <Review />],
     collection: ["collection", <Collection />],

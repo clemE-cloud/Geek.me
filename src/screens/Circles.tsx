@@ -1,3 +1,4 @@
+import { isChild } from "../lib/content";
 import { fmt, today, weekDays, addDays } from "../lib/dates";
 import { xpOn } from "../lib/game";
 import { useGame } from "../lib/useGame";
@@ -9,30 +10,25 @@ export function Circles() {
   const thisWeek = days.reduce((n, d) => n + xpOn(state, d), 0);
   const lastWeek = weekDays(addDays(t, -7)).reduce((n, d) => n + xpOn(state, d), 0);
   const max = Math.max(1, ...days.map((d) => xpOn(state, d)));
+  const child = isChild(state.settings);
 
   return (
     <div className="stack">
       <div>
         <h1>Circles</h1>
-        <p className="note">Learning is better with a few people, not a few thousand.</p>
+        <p className="note">Small groups that learn together each week.</p>
       </div>
 
       <section className="card">
         <span className="label">How circles work</span>
         <ul className="ticks">
-          <li>
-            <b>Small groups.</b> 5 to 8 people, friends or matched by interests.
-          </li>
-          <li>
-            <b>A shared weekly goal.</b> Everyone's XP fills one bar. Hit it together and the whole circle earns a rare card.
-          </li>
-          <li>
-            <b>No demotions.</b> There's an optional weekly ranking inside the circle, but nobody gets kicked down a league.
-          </li>
+          <li>{child ? "A circle is your family or your class, set up by a parent or teacher." : "A circle is 5 to 8 people: friends, family, or people who like the same topics."}</li>
+          <li>Everyone's XP adds up toward one weekly goal. If the circle reaches it, everyone gets a special card.</li>
+          <li>You can see a ranking inside your circle if you want to. Nobody gets moved down a league.</li>
         </ul>
         <div className="notice">
-          <b>Coming with accounts.</b> Circles need sign-in so you can find each other. For now your progress is saved on this
-          device.
+          Circles need accounts so you can find each other, and accounts aren't ready yet. For now, your progress is saved on
+          this device.
         </div>
       </section>
 
@@ -61,7 +57,7 @@ export function Circles() {
             </div>
           ))}
         </div>
-        <p className="note">The only person worth beating is who you were last week.</p>
+
       </section>
     </div>
   );

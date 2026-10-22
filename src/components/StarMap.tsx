@@ -1,4 +1,4 @@
-import { lessonById } from "../data/lessons";
+import { lessonView } from "../lib/content";
 import { isLearned, isUnlocked } from "../lib/game";
 import type { Constellation, GameState } from "../lib/types";
 
@@ -32,7 +32,7 @@ export function StarMap({ c, state, onPick }: { c: Constellation; state: GameSta
         const learned = isLearned(state, id);
         const open = isUnlocked(state, c, id);
         const cls = learned ? "star learned" : open ? "star open" : "star locked";
-        const title = lessonById(id)?.title ?? id;
+        const title = lessonView(id, state.settings.level)?.title ?? id;
         return (
           <g
             key={id}

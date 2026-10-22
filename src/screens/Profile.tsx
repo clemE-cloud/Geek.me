@@ -1,12 +1,14 @@
 import { useState } from "react";
 import { LESSONS } from "../data/lessons";
+import { AGE_BANDS, defaultsForAge } from "../lib/content";
 import { today } from "../lib/dates";
 import { rhythmWeeks } from "../lib/game";
 import { useGame } from "../lib/useGame";
+import type { AgeBand, Level, Look, TextSize } from "../lib/types";
 
 export function Profile() {
   const { state, store, updateSettings, reset } = useGame();
-  const { name, daysPerWeek, dailyGoal } = state.settings;
+  const { name, age, level, look, textSize, daysPerWeek, dailyGoal } = state.settings;
   const [confirming, setConfirming] = useState(false);
 
   const exportProgress = () => {
@@ -28,8 +30,8 @@ export function Profile() {
           <>
             <h2>Learning as a guest</h2>
             <p className="note">
-              Your progress is saved in this browser only. Sign-in with GitHub, Google or email is coming, so you can sync across
-              devices and join circles. Your guest progress will carry over.
+              Your progress is saved in this browser only. Sign-in is on the way. When it arrives, you'll be able to use more than
+              one device and join a circle, and you'll keep the progress you have now.
             </p>
           </>
         ) : (
@@ -50,7 +52,7 @@ export function Profile() {
         </div>
         <div>
           <b className="big">{rhythmWeeks(state, today())}</b>
-          <span className="label">Week run</span>
+          <span className="label">Weeks in a row</span>
         </div>
       </section>
 
@@ -60,7 +62,46 @@ export function Profile() {
           <input value={name} maxLength={40} onChange={(e) => updateSettings({ name: e.target.value })} />
         </label>
         <label className="field">
-          <span className="label">Weekly rhythm</span>
+          <span className="label">Age</span>
+          <select
+            value={age ?? ""}
+            onChange={(e) => {
+              const band = e.target.value as AgeBand;
+              updateSettings({ age: band, ...defaultsForAge(band) });
+            }}
+          >
+            {!age && <option value="">Not set</option>}
+            {AGE_BANDS.map((a) => (
+              <option key={a.band} value={a.band}>
+                {a.label}
+              </option>
+            ))}
+          </select>
+          <span className="note">Changing your age also resets the three settings below.</span>
+        </label>
+        <label className="field">
+          <span className="label">Lessons</span>
+          <select value={level} onChange={(e) => updateSettings({ level: e.target.value as Level })}>
+            <option value="young">Simpler (about ages 6–12)</option>
+            <option value="standard">Standard</option>
+          </select>
+        </label>
+        <label className="field">
+          <span className="label">Look</span>
+          <select value={look} onChange={(e) => updateSettings({ look: e.target.value as Look })}>
+            <option value="calm">Calm (follows your device's light or dark mode)</option>
+            <option value="bright">Bright</option>
+          </select>
+        </label>
+        <label className="field">
+          <span className="label">Text size</span>
+          <select value={textSize} onChange={(e) => updateSettings({ textSize: e.target.value as TextSize })}>
+            <option value="normal">Normal</option>
+            <option value="large">Large</option>
+          </select>
+        </label>
+        <label className="field">
+          <span className="label">Days per week</span>
           <select value={daysPerWeek} onChange={(e) => updateSettings({ daysPerWeek: Number(e.target.value) })}>
             {[2, 3, 4, 5, 6, 7].map((n) => (
               <option key={n} value={n}>

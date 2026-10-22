@@ -1,7 +1,9 @@
 import type { CSSProperties } from "react";
 import { GoalRing, Chip, WeekStrip, subjectColor } from "../components/Bits";
+import { Daily } from "../components/Daily";
 import { IconArrow } from "../components/Icons";
 import { constellationOf } from "../data/constellations";
+import { lessonView } from "../lib/content";
 import { today } from "../lib/dates";
 import { activeDaysInWeek, dueItems, nextLesson, rhythmMet, rhythmWeeks, xpOn } from "../lib/game";
 import { go } from "../lib/router";
@@ -21,7 +23,8 @@ export function Today() {
   const met = rhythmMet(state, t);
   const weeks = rhythmWeeks(state, t);
   const due = dueItems(state, t).length;
-  const lesson = nextLesson(state);
+  const next = nextLesson(state);
+  const lesson = next && lessonView(next.id, state.settings.level);
   const c = lesson && constellationOf(lesson.id);
 
   return (
@@ -41,10 +44,10 @@ export function Today() {
           <WeekStrip state={state} />
           <span className="note">
             {met
-              ? "Rhythm met this week. Anything more is a bonus."
+              ? "You've hit your days for this week."
               : weeks > 0
-                ? `${weeks}-week run. Rest days don't break it.`
-                : "Any days count. Rest days never break anything."}
+                ? `${weeks} week${weeks > 1 ? "s" : ""} in a row. Days off don't count against you.`
+                : "Any days count. Days off don't count against you."}
           </span>
         </div>
       </section>
@@ -74,16 +77,15 @@ export function Today() {
       ) : (
         <section className="card">
           <span className="label">Library complete</span>
-          <h2>You've lit the whole sky.</h2>
-          <p className="note">
-            Every lesson is done. Keep going in Review: spaced practice is what makes them stick. New lessons will appear here
-            as they're added.
-          </p>
+          <h2>You've finished every lesson.</h2>
+          <p className="note">Keep going in Review so they stick. New lessons will show up here when they're added.</p>
           <button className="btn" onClick={() => go("review")}>
             Go to Review
           </button>
         </section>
       )}
+
+      <Daily />
 
       {due > 0 && (
         <button className="card row-card" onClick={() => go("review")}>
@@ -92,7 +94,7 @@ export function Today() {
             <b>
               {due} question{due > 1 ? "s" : ""} ready
             </b>
-            <span className="note">Recall them before they fade. Each right answer refills focus.</span>
+            <span className="note">Each right answer also refills focus.</span>
           </div>
           <IconArrow />
         </button>

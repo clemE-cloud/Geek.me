@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { lessonById } from "../data/lessons";
+import { lessonView } from "../lib/content";
 import { useGame } from "../lib/useGame";
 import type { QuizItem } from "../lib/types";
 import { Chip, FocusMeter } from "./Bits";
@@ -19,7 +19,7 @@ export function Quiz({ items, kind, onQuit, onDone }: Props) {
   const [results, setResults] = useState<boolean[]>([]);
 
   const it = items[i];
-  const lesson = lessonById(it.lessonId)!;
+  const lesson = lessonView(it.lessonId, state.settings.level)!;
   const q = lesson.qs[it.qi];
 
   const pick = (k: number) => {
