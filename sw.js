@@ -1,5 +1,5 @@
 // Offline support: pages are network-first (so updates arrive), everything else is served from cache and refreshed in the background.
-const CACHE = "geekme-v1";
+const CACHE = "geekme-v2";
 
 self.addEventListener("install", () => self.skipWaiting());
 
@@ -15,6 +15,11 @@ self.addEventListener("activate", (e) => {
 self.addEventListener("fetch", (e) => {
   const req = e.request;
   if (req.method !== "GET" || !req.url.startsWith("http")) return;
+  // Only the app's own files and its fonts. API calls (e.g. Supabase) must always go to the network.
+  const url = new URL(req.url);
+  const cacheable =
+    url.origin === self.location.origin || url.hostname === "fonts.googleapis.com" || url.hostname === "fonts.gstatic.com";
+  if (!cacheable) return;
 
   if (req.mode === "navigate") {
     e.respondWith(
