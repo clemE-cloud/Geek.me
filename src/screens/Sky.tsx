@@ -43,7 +43,11 @@ export function Sky() {
                 const open = isUnlocked(state, c, id);
                 return (
                   <li key={id}>
-                    <button className={learned ? "learned" : open ? "open" : "locked"} disabled={!learned && !open} onClick={() => pick(id)}>
+                    <button
+                      className={learned ? "learned" : open ? "open" : "locked"}
+                      disabled={!learned && !open}
+                      onClick={() => pick(id)}
+                    >
                       <span className="state">
                         {learned ? <IconCheck width={12} height={12} /> : open ? "●" : <IconLock width={12} height={12} />}
                       </span>

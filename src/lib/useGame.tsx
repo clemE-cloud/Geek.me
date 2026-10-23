@@ -11,6 +11,8 @@ import {
   completeReview,
   freshState,
   type Achievement,
+  startBreak,
+  endBreak as endBreakOn,
 } from "./game";
 import { localStore, type ProgressStore } from "./storage";
 import { supabase } from "./supabase";
@@ -51,6 +53,11 @@ interface GameApi {
   removeProfile(id: string): void;
   /** Saves anything pending, signs out and clears this device's copy. */
   signOut(): Promise<void>;
+  /** Deletes the account (if signed in) and everything stored on this device. Returns an error message, or null. */
+  deleteEverything(): Promise<string | null>;
+  /** Starts a break for the active profile; `until` is the last day, or null for "until I resume". */
+  takeBreak(until: string | null): void;
+  endBreak(): void;
 }
 
 const Ctx = createContext<GameApi | null>(null);
@@ -185,6 +192,18 @@ export function GameProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
+  /** Clears this device's copy and returns to a fresh guest start. */
+  const forgetDevice = useCallback(async () => {
+    await localStore.clear();
+    setCacheOwner("guest");
+    switchStore(localStore);
+    setSync("idle");
+    choose(null);
+    write(session, PICKED_KEY, null);
+    setPicked(false);
+    commitAccount(emptyAccount());
+  }, [choose, commitAccount]);
+
   const api = useMemo<GameApi>(() => {
     // Read through refs so an action always works on the latest progress, even right after another action.
     const current = () => profileOf(accountRef.current, activeRef.current)?.state ?? freshState();
@@ -266,17 +285,24 @@ export function GameProvider({ children }: { children: ReactNode }) {
       async signOut() {
         await (storeRef.current as Partial<CloudStore>).flush?.();
         await auth.signOut();
-        await localStore.clear();
-        setCacheOwner("guest");
-        switchStore(localStore);
-        setSync("idle");
-        choose(null);
-        write(session, PICKED_KEY, null);
-        setPicked(false);
-        commitAccount(emptyAccount());
+        await forgetDevice();
+      },
+      async deleteEverything() {
+        if (auth.user) {
+          const err = await auth.deleteAccount();
+          if (err) return err;
+        }
+        await forgetDevice();
+        return null;
+      },
+      takeBreak(until) {
+        commit(startBreak(current(), today(), until));
+      },
+      endBreak() {
+        commit(endBreakOn(current(), today()));
       },
     };
-  }, [state, account, profile, picked, ready, store, sync, commit, commitAccount, choose, auth]);
+  }, [state, account, profile, picked, ready, store, sync, commit, commitAccount, choose, auth, forgetDevice]);
 
   return <Ctx.Provider value={api}>{children}</Ctx.Provider>;
 }

@@ -20,6 +20,7 @@ export const freshState = (): GameState => ({
     daysPerWeek: 4,
     dailyGoal: 30,
     onboarded: false,
+    avatar: "",
   },
   xp: 0,
   xpByDay: {},
@@ -30,6 +31,7 @@ export const freshState = (): GameState => ({
   reviewsCorrect: 0,
   achievements: {},
   daily: {},
+  breaks: [],
 });
 
 /* ---------- lessons and the map ---------- */
@@ -42,8 +44,7 @@ export const isUnlocked = (s: GameState, c: Constellation, id: string) => {
   return i >= 0 && c.lessons.slice(0, i).every((x) => isLearned(s, x));
 };
 
-export const constellationProgress = (s: GameState, c: Constellation) =>
-  c.lessons.filter((id) => isLearned(s, id)).length;
+export const constellationProgress = (s: GameState, c: Constellation) => c.lessons.filter((id) => isLearned(s, id)).length;
 
 export const isComplete = (s: GameState, c: Constellation) => constellationProgress(s, c) === c.lessons.length;
 
@@ -73,11 +74,37 @@ export const rhythmMet = (s: GameState, day: string) => activeDaysInWeek(s, day)
 export function rhythmWeeks(s: GameState, t: string): number {
   let n = rhythmMet(s, t) ? 1 : 0;
   let w = addDays(weekStart(t), -7);
-  while (rhythmMet(s, w)) {
-    n++;
-    w = addDays(w, -7);
+  // Weeks during a break are skipped: they neither add to the run nor end it.
+  for (let i = 0; i < 520; i++, w = addDays(w, -7)) {
+    if (rhythmMet(s, w)) n++;
+    else if (!weekOnBreak(s, w)) break;
   }
   return n;
+}
+
+/* ---------- breaks ---------- */
+
+/** The break covering day `t`, if any. */
+export const breakOn = (s: GameState, t: string) =>
+  (s.breaks ?? []).find((b) => b.start <= t && (b.end === null || t <= b.end)) ?? null;
+
+const weekOnBreak = (s: GameState, day: string) => weekDays(day).some((d) => !!breakOn(s, d));
+
+/** Starts a break today. `until` is the last day of the break, or null for "until I resume". */
+export function startBreak(s: GameState, t: string, until: string | null): GameState {
+  const others = (s.breaks ?? []).filter((b) => !(b.start <= t && (b.end === null || t <= b.end)));
+  return { ...s, breaks: [...others, { start: t, end: until }] };
+}
+
+/** Ends any current break as of yesterday, so today counts normally. */
+export function endBreak(s: GameState, t: string): GameState {
+  const y = addDays(t, -1);
+  return {
+    ...s,
+    breaks: (s.breaks ?? [])
+      .map((b) => (b.start <= t && (b.end === null || t <= b.end) ? { ...b, end: y } : b))
+      .filter((b) => b.end === null || b.start <= b.end),
+  };
 }
 
 /* ---------- review ---------- */
@@ -178,15 +205,57 @@ export interface Achievement {
 }
 
 export const ACHIEVEMENTS: Achievement[] = [
-  { id: "first-light", title: "First light", desc: "Finish your first lesson", glyph: "✦", test: (s) => Object.keys(s.learned).length >= 1 },
-  { id: "five-stars", title: "Five stars", desc: "Finish 5 lessons", glyph: "✶", test: (s) => Object.keys(s.learned).length >= 5 },
-  { id: "flawless", title: "Flawless", desc: "Get every question right in a lesson", glyph: "◆", test: (s) => s.perfectLessons >= 1 },
-  { id: "daily-goal", title: "Goal met", desc: "Reach your daily XP goal", glyph: "◎", test: (s, t) => xpOn(s, t) >= s.settings.dailyGoal },
+  {
+    id: "first-light",
+    title: "First light",
+    desc: "Finish your first lesson",
+    glyph: "✦",
+    test: (s) => Object.keys(s.learned).length >= 1,
+  },
+  {
+    id: "five-stars",
+    title: "Five stars",
+    desc: "Finish 5 lessons",
+    glyph: "✶",
+    test: (s) => Object.keys(s.learned).length >= 5,
+  },
+  {
+    id: "flawless",
+    title: "Flawless",
+    desc: "Get every question right in a lesson",
+    glyph: "◆",
+    test: (s) => s.perfectLessons >= 1,
+  },
+  {
+    id: "daily-goal",
+    title: "Goal met",
+    desc: "Reach your daily XP goal",
+    glyph: "◎",
+    test: (s, t) => xpOn(s, t) >= s.settings.dailyGoal,
+  },
   { id: "in-rhythm", title: "In rhythm", desc: "Hit your weekly rhythm", glyph: "♪", test: (s, t) => rhythmMet(s, t) },
   { id: "steady", title: "Steady", desc: "Hit your rhythm 3 weeks in a row", glyph: "♫", test: (s, t) => rhythmWeeks(s, t) >= 3 },
-  { id: "join-dots", title: "Join the dots", desc: "Complete a constellation", glyph: "⟡", test: (s) => CONSTELLATIONS.some((c) => isComplete(s, c)) },
-  { id: "recall", title: "Total recall", desc: "Answer 25 review questions right", glyph: "↻", test: (s) => s.reviewsCorrect >= 25 },
-  { id: "daily-5", title: "Regular", desc: "Answer 5 daily questions", glyph: "☾", test: (s) => Object.keys(s.daily).length >= 5 },
+  {
+    id: "join-dots",
+    title: "Join the dots",
+    desc: "Complete a constellation",
+    glyph: "⟡",
+    test: (s) => CONSTELLATIONS.some((c) => isComplete(s, c)),
+  },
+  {
+    id: "recall",
+    title: "Total recall",
+    desc: "Answer 25 review questions right",
+    glyph: "↻",
+    test: (s) => s.reviewsCorrect >= 25,
+  },
+  {
+    id: "daily-5",
+    title: "Regular",
+    desc: "Answer 5 daily questions",
+    glyph: "☾",
+    test: (s) => Object.keys(s.daily).length >= 5,
+  },
   { id: "xp-250", title: "250 XP", desc: "Earn 250 XP", glyph: "⚡", test: (s) => s.xp >= 250 },
   { id: "full-sky", title: "Full sky", desc: "Finish every lesson", glyph: "☼", test: (s) => allLearned(s) },
 ];

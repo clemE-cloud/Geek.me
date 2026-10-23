@@ -3,21 +3,22 @@ import { today } from "../lib/dates";
 import { dueItems } from "../lib/game";
 import { go } from "../lib/router";
 import { useGame } from "../lib/useGame";
+import { Avatar } from "./Avatar";
 import { FocusMeter } from "./Bits";
-import { IconBolt, IconCards, IconCircles, IconReview, IconSky, IconToday } from "./Icons";
+import { IconBolt, IconCards, IconCircles, IconReview, IconSky, IconToday, IconUser } from "./Icons";
 
 const TABS = [
   { id: "today", label: "Today", Icon: IconToday },
   { id: "sky", label: "Sky", Icon: IconSky },
   { id: "review", label: "Review", Icon: IconReview },
-  { id: "collection", label: "Collection", Icon: IconCards },
+  { id: "collection", label: "Cards", Icon: IconCards },
   { id: "circles", label: "Circles", Icon: IconCircles },
+  { id: "profile", label: "Profile", Icon: IconUser },
 ];
 
 export function Shell({ tab, children }: { tab: string; children: ReactNode }) {
   const { state } = useGame();
   const due = dueItems(state, today()).length;
-  const initial = (state.settings.name.trim()[0] ?? "?").toUpperCase();
   return (
     <>
       <header className="top">
@@ -31,7 +32,7 @@ export function Shell({ tab, children }: { tab: string; children: ReactNode }) {
             {state.xp}
           </span>
           <button className="avatar" onClick={() => go("profile")} aria-label="Profile and settings">
-            {initial}
+            <Avatar settings={state.settings} size={34} />
           </button>
         </div>
       </header>

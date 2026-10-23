@@ -13,6 +13,10 @@ interface AuthApi {
   sendEmail(email: string): Promise<string | null>;
   verifyCode(email: string, code: string): Promise<string | null>;
   signOut(): Promise<void>;
+  /** Starts an email change; Supabase emails a confirmation link. Returns an error message, or null. */
+  changeEmail(email: string): Promise<string | null>;
+  /** Permanently deletes the signed-in account and its progress. Returns an error message, or null. */
+  deleteAccount(): Promise<string | null>;
   /** Set when an email link couldn't sign the person in, with what to do about it. */
   linkProblem: string | null;
   dismissLinkProblem(): void;
@@ -82,6 +86,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       },
       async signOut() {
         await supabase?.auth.signOut();
+      },
+      async changeEmail(email) {
+        if (!supabase) return "Accounts aren't available.";
+        const { error } = await supabase.auth.updateUser({ email }, { emailRedirectTo: appUrl() });
+        return error ? friendly(error.message) : null;
+      },
+      async deleteAccount() {
+        if (!supabase) return "Accounts aren't available.";
+        const { error } = await supabase.rpc("delete_my_account");
+        if (error) return friendly(error.message);
+        await supabase.auth.signOut({ scope: "local" });
+        return null;
       },
       linkProblem,
       dismissLinkProblem: () => setLinkProblem(null),

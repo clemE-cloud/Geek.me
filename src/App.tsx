@@ -7,6 +7,7 @@ import { Circles } from "./screens/Circles";
 import { CardView, Collection } from "./screens/Collection";
 import { LessonPlayer } from "./screens/LessonPlayer";
 import { Onboarding } from "./screens/Onboarding";
+import { Privacy } from "./screens/Privacy";
 import { Profile } from "./screens/Profile";
 import { ProfilePicker } from "./screens/ProfilePicker";
 import { Review } from "./screens/Review";
@@ -36,6 +37,13 @@ export function App() {
       </main>
     );
   }
+  if (page === "privacy") {
+    return (
+      <main className="wrap solo">
+        <Privacy />
+      </main>
+    );
+  }
   if (!account.setupDone) return <Onboarding />;
   if (needsPicker || !profile) return <ProfilePicker />;
 
@@ -55,7 +63,7 @@ export function App() {
     collection: ["collection", <Collection />],
     card: ["collection", <CardView id={arg} />],
     circles: ["circles", <Circles />],
-    profile: ["", <Profile />],
+    profile: ["profile", <Profile />],
   };
   const [tab, screen] = screens[page] ?? screens.today;
   return <Shell tab={tab}>{screen}</Shell>;

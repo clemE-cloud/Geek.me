@@ -45,6 +45,12 @@ export const IconCircles = (p: SVGProps<SVGSVGElement>) => (
     <circle cx="15" cy="15" r="5" />
   </svg>
 );
+export const IconUser = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...base(p)}>
+    <circle cx="12" cy="8" r="4" />
+    <path d="M4 21a8 8 0 0 1 16 0" />
+  </svg>
+);
 export const IconFocus = (p: SVGProps<SVGSVGElement>) => (
   <svg {...base({ ...p, fill: "currentColor", stroke: "none" })}>
     <path d="M12 2 14.6 9.4 22 12l-7.4 2.6L12 22l-2.6-7.4L2 12l7.4-2.6z" />

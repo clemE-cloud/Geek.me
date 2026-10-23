@@ -62,7 +62,7 @@ export function FamilySection() {
   return (
     <section className="card stack-sm">
       <span className="label">Family</span>
-      <h2>{children.length ? "Your children" : "Add your children"}</h2>
+      <h2>{children.length ? "Your children" : "Children"}</h2>
       <p className="note">
         Children under 16 learn on your account. Each child gets their own profile, with lessons and a look that suit their age.
       </p>
@@ -101,11 +101,11 @@ export function FamilySection() {
         </div>
       ))}
       {removing && <p className="note bad-text">Removing a profile deletes that child's progress.</p>}
-      {adding || !children.length ? (
+      {adding ? (
         <AddChildForm onAdd={(p) => (addProfile(p), setAdding(false))} />
       ) : (
         <button className="btn ghost" onClick={() => setAdding(true)}>
-          Add another child
+          {children.length ? "Add another child" : "Add a child's profile"}
         </button>
       )}
     </section>

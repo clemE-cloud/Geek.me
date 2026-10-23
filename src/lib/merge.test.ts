@@ -61,6 +61,22 @@ describe("mergeStates", () => {
   });
 });
 
+describe("merging breaks", () => {
+  it("keeps breaks from both copies once", () => {
+    const a = make({ breaks: [{ start: "2026-10-01", end: "2026-10-07" }] });
+    const b = make({
+      breaks: [
+        { start: "2026-10-01", end: "2026-10-07" },
+        { start: "2026-11-01", end: null },
+      ],
+    });
+    expect(mergeStates(a, b).breaks).toEqual([
+      { start: "2026-10-01", end: "2026-10-07" },
+      { start: "2026-11-01", end: null },
+    ]);
+  });
+});
+
 describe("hasProgress", () => {
   it("is false for a fresh state and true once anything is done", () => {
     expect(hasProgress(freshState())).toBe(false);

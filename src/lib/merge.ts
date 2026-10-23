@@ -33,8 +33,12 @@ export function mergeStates(primary: GameState, other: GameState): GameState {
     reviewsCorrect: Math.max(primary.reviewsCorrect, other.reviewsCorrect),
     achievements: unite(primary.achievements, other.achievements, (x, y) => earlier(x, y)!),
     daily: unite(primary.daily, other.daily, (x, y) => x || y),
+    breaks: [
+      ...(primary.breaks ?? []),
+      ...(other.breaks ?? []).filter((b) => !(primary.breaks ?? []).some((p) => p.start === b.start)),
+    ],
   };
 }
 
-/** True if the state has any progress worth keeping (used to skip merging an empty guest session). */
+/** True if the state has any progress worth keeping. */
 export const hasProgress = (s: GameState) => s.xp > 0 || Object.keys(s.learned).length > 0 || Object.keys(s.daily).length > 0;

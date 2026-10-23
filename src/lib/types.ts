@@ -71,6 +71,14 @@ export interface Settings {
   /** Daily XP goal. */
   dailyGoal: number;
   onboarded: boolean;
+  /** A chosen avatar (an emoji). Empty means show the first letter of the name. */
+  avatar: string;
+}
+
+/** A break from learning. While it lasts, missed weeks don't end a run. `end` null means "until I resume". */
+export interface Break {
+  start: string;
+  end: string | null;
 }
 
 export interface GameState {
@@ -90,6 +98,7 @@ export interface GameState {
   achievements: Record<string, string>;
   /** Daily question results: date -> answered correctly. */
   daily: Record<string, boolean>;
+  breaks: Break[];
 }
 
 export interface QuizItem {

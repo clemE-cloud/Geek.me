@@ -4,8 +4,8 @@ import { Daily } from "../components/Daily";
 import { IconArrow } from "../components/Icons";
 import { constellationOf } from "../data/constellations";
 import { lessonView } from "../lib/content";
-import { today } from "../lib/dates";
-import { activeDaysInWeek, dueItems, nextLesson, rhythmMet, rhythmWeeks, xpOn } from "../lib/game";
+import { fmt, today } from "../lib/dates";
+import { activeDaysInWeek, breakOn, dueItems, nextLesson, rhythmMet, rhythmWeeks, xpOn } from "../lib/game";
 import { go } from "../lib/router";
 import { useGame } from "../lib/useGame";
 
@@ -16,7 +16,7 @@ const greeting = () => {
 const mins = (words: string[]) => Math.max(1, Math.round(words.join(" ").split(/\s+/).length / 200));
 
 export function Today() {
-  const { state } = useGame();
+  const { state, endBreak } = useGame();
   const t = today();
   const { daysPerWeek, dailyGoal, name } = state.settings;
   const active = activeDaysInWeek(state, t);
@@ -26,6 +26,7 @@ export function Today() {
   const next = nextLesson(state);
   const lesson = next && lessonView(next.id, state.settings.level);
   const c = lesson && constellationOf(lesson.id);
+  const onBreak = breakOn(state, t);
 
   return (
     <div className="stack">
@@ -33,6 +34,19 @@ export function Today() {
         {greeting()}
         {name ? `, ${name}` : ""}.
       </h1>
+
+      {onBreak && (
+        <section className="card break-banner">
+          <span className="label">On a break</span>
+          <p className="note">
+            {onBreak.end ? `Until ${fmt(onBreak.end, { weekday: "long", day: "numeric", month: "long" })}.` : "Until you resume."}{" "}
+            Your weeks in a row are safe. Lessons still count if you do one.
+          </p>
+          <button className="btn ghost small-btn" onClick={endBreak}>
+            Resume now
+          </button>
+        </section>
+      )}
 
       <section className="card rhythm">
         <GoalRing value={xpOn(state, t)} goal={dailyGoal} />

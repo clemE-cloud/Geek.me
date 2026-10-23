@@ -12,7 +12,10 @@ import {
   freshState,
   isUnlocked,
   nextLesson,
+  breakOn,
+  endBreak,
   rhythmWeeks,
+  startBreak,
 } from "./game";
 import { migrateV1 } from "./storage";
 
@@ -116,11 +119,50 @@ describe("achievements", () => {
 
 describe("v1 migration", () => {
   it("keeps lessons, cards and XP", () => {
-    const s = migrateV1({ P: { xp: 45, days: ["2026-10-20"], cards: { "b01:0": { box: 2, due: T } } }, L: { b01: { learnedOn: "2026-10-20" } } });
+    const s = migrateV1({
+      P: { xp: 45, days: ["2026-10-20"], cards: { "b01:0": { box: 2, due: T } } },
+      L: { b01: { learnedOn: "2026-10-20" } },
+    });
     expect(s?.learned).toEqual({ b01: "2026-10-20" });
     expect(s?.cards["b01:0"].box).toBe(2);
     expect(s?.xp).toBe(45);
     expect(s?.settings.onboarded).toBe(false);
     expect(migrateV1(null)).toBeNull();
+  });
+});
+
+describe("breaks", () => {
+  const mon = weekStart(T);
+  const active = (days: string[]) => {
+    const s = freshState();
+    s.settings.daysPerWeek = 2;
+    days.forEach((d) => (s.xpByDay[d] = 10));
+    return s;
+  };
+
+  it("keeps the run through weeks on a break", () => {
+    // Met three weeks ago and last week; two weeks ago was a holiday.
+    const w1 = addDays(mon, -7),
+      w3 = addDays(mon, -21);
+    let s = active([w1, addDays(w1, 1), w3, addDays(w3, 1)]);
+    expect(rhythmWeeks(s, T)).toBe(1);
+    s = { ...s, breaks: [{ start: addDays(mon, -14), end: addDays(mon, -8) }] };
+    expect(rhythmWeeks(s, T)).toBe(2);
+  });
+
+  it("starts, reports and ends a break", () => {
+    let s = startBreak(freshState(), T, addDays(T, 6));
+    expect(breakOn(s, T)).toEqual({ start: T, end: addDays(T, 6) });
+    expect(breakOn(s, addDays(T, 7))).toBeNull();
+    s = startBreak(s, addDays(T, 2), null);
+    expect(s.breaks).toHaveLength(1);
+    expect(breakOn(s, addDays(T, 400))).not.toBeNull();
+    s = endBreak(s, addDays(T, 5));
+    expect(breakOn(s, addDays(T, 5))).toBeNull();
+    expect(breakOn(s, addDays(T, 4))).not.toBeNull();
+  });
+
+  it("removes a break that's ended on the day it started", () => {
+    expect(endBreak(startBreak(freshState(), T, null), T).breaks).toEqual([]);
   });
 });

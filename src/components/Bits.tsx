@@ -32,7 +32,14 @@ export function GoalRing({ value, goal, size = 92 }: { value: number; goal: numb
   const c = 2 * Math.PI * r;
   const p = Math.min(1, value / goal);
   return (
-    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="ring" role="img" aria-label={`${value} of ${goal} XP today`}>
+    <svg
+      width={size}
+      height={size}
+      viewBox={`0 0 ${size} ${size}`}
+      className="ring"
+      role="img"
+      aria-label={`${value} of ${goal} XP today`}
+    >
       <circle cx={size / 2} cy={size / 2} r={r} className="ring-bg" />
       <circle
         cx={size / 2}

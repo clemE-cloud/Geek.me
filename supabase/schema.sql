@@ -35,3 +35,25 @@ drop policy if exists "Delete own progress" on public.progress;
 create policy "Delete own progress" on public.progress
   for delete to authenticated
   using ((select auth.uid()) = user_id);
+
+-- Lets a signed-in person delete their own account (Profile → Your data → Delete my account).
+-- Their progress row goes too, through the foreign key's ON DELETE CASCADE.
+-- It can only ever act on the caller (auth.uid()), and signed-out visitors can't run it.
+create or replace function public.delete_my_account()
+returns void
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  me uuid := auth.uid();
+begin
+  if me is null then
+    raise exception 'Not signed in' using errcode = '42501';
+  end if;
+  delete from auth.users where id = me;
+end;
+$$;
+
+revoke all on function public.delete_my_account() from public, anon;
+grant execute on function public.delete_my_account() to authenticated;
