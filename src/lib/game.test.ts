@@ -44,6 +44,13 @@ describe("lessons", () => {
     expect(nextLesson(s)?.id).toBe(c.lessons[1]);
   });
 
+  it("starts with the topics picked at sign-up", () => {
+    const picked = CONSTELLATIONS[CONSTELLATIONS.length - 1];
+    const s = freshState();
+    s.settings.interests = ["nope", picked.id];
+    expect(nextLesson(s)?.id).toBe(picked.lessons[0]);
+  });
+
   it("awards XP and schedules review cards", () => {
     const { state, gained } = completeLesson(freshState(), lesson, [true, false, true], T);
     expect(gained).toBe(20);

@@ -49,10 +49,13 @@ export const constellationProgress = (s: GameState, c: Constellation) => c.lesso
 
 export const isComplete = (s: GameState, c: Constellation) => constellationProgress(s, c) === c.lessons.length;
 
-/** Suggested next lesson: continue a constellation already started, otherwise open the next one. */
+/** Suggested next lesson: continue a constellation already started, then the topics picked at sign-up, then the next one. */
 export function nextLesson(s: GameState): Lesson | undefined {
   const started = CONSTELLATIONS.find((c) => !isComplete(s, c) && constellationProgress(s, c) > 0);
-  const c = started ?? CONSTELLATIONS.find((x) => !isComplete(s, x));
+  const wanted = (s.settings.interests ?? [])
+    .map((id) => CONSTELLATIONS.find((c) => c.id === id))
+    .find((c) => c && !isComplete(s, c));
+  const c = started ?? wanted ?? CONSTELLATIONS.find((x) => !isComplete(s, x));
   const id = c?.lessons.find((x) => !isLearned(s, x));
   return id ? lessonById(id) : undefined;
 }

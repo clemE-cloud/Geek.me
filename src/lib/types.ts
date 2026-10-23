@@ -73,6 +73,8 @@ export interface Settings {
   onboarded: boolean;
   /** A chosen avatar (an emoji). Empty means show the first letter of the name. */
   avatar: string;
+  /** Constellation ids picked at sign-up, most wanted first. New topics start from these. */
+  interests?: string[];
 }
 
 /** A break from learning. While it lasts, missed weeks don't end a run. `end` null means "until I resume". */

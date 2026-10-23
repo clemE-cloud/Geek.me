@@ -1,12 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { LESSONS } from "../data/lessons";
-import { DAILY_EPOCH, DAILY_POOL, dailyItem, dailyNumber, defaultsForAge, isChild, lessonView } from "./content";
+import { DAILY_EPOCH, DAILY_POOL, dailyItem, dailyNumber, defaultsForAge, isChild, lessonView, toBeats } from "./content";
 import { addDays } from "./dates";
 import { answerDaily, freshState } from "./game";
 
 describe("lesson library", () => {
-  it("has 100 lessons with unique ids", () => {
-    expect(LESSONS.length).toBe(100);
+  it("has 108 lessons with unique ids", () => {
+    expect(LESSONS.length).toBe(108);
     expect(new Set(LESSONS.map((l) => l.id)).size).toBe(LESSONS.length);
   });
 
@@ -115,5 +115,20 @@ describe("daily question", () => {
     expect(s.daily[DAILY_EPOCH]).toBe(true);
     expect(s.xp).toBe(5);
     expect(answerDaily(s, addDays(DAILY_EPOCH, 1), false).xp).toBe(5);
+  });
+});
+
+describe("story beats", () => {
+  it("keep every word, in order, and stay short", () => {
+    for (const l of LESSONS)
+      for (const body of [l.body, l.young.body]) {
+        const beats = toBeats(body);
+        expect(beats.join(" ").split(/\s+/), l.id).toEqual(body.join(" ").split(/\s+/));
+        for (const b of beats) if (/[.!?]["”’)]?\s+[A-Z]/.test(b)) expect(b.split(/\s+/).length, `${l.id}: ${b}`).toBeLessThanOrEqual(42);
+      }
+  });
+
+  it("never join two paragraphs", () => {
+    expect(toBeats(["One two.", "Three four."])).toEqual(["One two.", "Three four."]);
   });
 });

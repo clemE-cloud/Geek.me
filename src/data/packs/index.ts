@@ -12,6 +12,7 @@ import gardener from "./gardener";
 import wanderer from "./wanderer";
 import coder from "./coder";
 import chef from "./chef";
+import storyteller from "./storyteller";
 
 /*
  * One file per constellation. Lessons unlock in the order they appear in each file.
@@ -53,4 +54,5 @@ export const PACKS: Pack[] = [
   wanderer,
   coder,
   chef,
+  storyteller,
 ];

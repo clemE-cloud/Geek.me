@@ -75,3 +75,28 @@ export function dailyItem(day: string): QuizItem {
   const len = DAILY_ORDER.length;
   return DAILY_ORDER[((n % len) + len) % len];
 }
+
+/* ---------- lessons as story cards ---------- */
+
+const BEAT_WORDS = 34;
+const words = (t: string) => t.split(/\s+/).filter(Boolean).length;
+
+/**
+ * Splits a lesson's paragraphs into short "beats", one per screen: a sentence or two each,
+ * never mixing paragraphs, so the lesson reads like a story rather than a page of text.
+ */
+export function toBeats(body: string[]): string[] {
+  const beats: string[] = [];
+  for (const p of body) {
+    const sentences = p.split(/(?<=[.!?][’'"”)]?)\s+(?=[A-Z0-9“"‘'(À-ÿ])/);
+    let cur = "";
+    for (const sentence of sentences) {
+      if (cur && words(cur) + words(sentence) > BEAT_WORDS) {
+        beats.push(cur);
+        cur = sentence;
+      } else cur = cur ? `${cur} ${sentence}` : sentence;
+    }
+    if (cur) beats.push(cur);
+  }
+  return beats;
+}

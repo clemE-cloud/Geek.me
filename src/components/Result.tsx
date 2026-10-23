@@ -13,9 +13,12 @@ interface Props {
   note: string;
   share?: ReactNode;
   onContinue: () => void;
+  continueLabel?: string;
+  /** Shown above the continue button, e.g. what's up next. */
+  after?: ReactNode;
 }
 
-export function Result({ title, gained, right, total, earned, card, note, share, onContinue }: Props) {
+export function Result({ title, gained, right, total, earned, card, note, share, onContinue, continueLabel = "Continue", after }: Props) {
   return (
     <section className="result">
       <span className="label">{title}</span>
@@ -47,8 +50,10 @@ export function Result({ title, gained, right, total, earned, card, note, share,
         </div>
       ))}
 
-      <button className="btn wide" onClick={onContinue} autoFocus>
-        Continue
+      {after}
+
+      <button className={after ? "btn ghost wide" : "btn wide"} onClick={onContinue} autoFocus={!after}>
+        {continueLabel}
       </button>
     </section>
   );
