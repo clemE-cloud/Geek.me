@@ -7,6 +7,7 @@ import { CircleSync } from "./components/CircleSync";
 import { CircleView, Circles, JoinCircle } from "./screens/Circles";
 import { CardView, Collection } from "./screens/Collection";
 import { LessonPlayer } from "./screens/LessonPlayer";
+import { Landing } from "./screens/Landing";
 import { Onboarding } from "./screens/Onboarding";
 import { Privacy } from "./screens/Privacy";
 import { Why } from "./screens/Why";
@@ -45,7 +46,11 @@ export function App() {
   if (!account.setupDone) {
     // Keep an invite link for after set-up.
     if (page === "join" && arg) sessionStorage.setItem("geekme-join", arg);
-    return <Onboarding />;
+    // New visitors see the landing page; "Start" (or an invite, or a set-up already under way) opens onboarding.
+    if (page === "start" || page === "join" || account.profiles.length) {
+      return <Onboarding initialStep={arg === "signin" ? "signin" : undefined} />;
+    }
+    return <Landing />;
   }
   if (needsPicker || !profile) return <ProfilePicker />;
 

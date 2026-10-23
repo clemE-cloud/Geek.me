@@ -23,10 +23,10 @@ type Step = "start" | "signin" | "me-name" | "me-age" | "me-days" | "me-goal" | 
 
 const ageLabel = (band: AgeBand | null) => AGE_BANDS.find((a) => a.band === band)?.label ?? "";
 
-export function Onboarding() {
+export function Onboarding({ initialStep }: { initialStep?: "signin" } = {}) {
   const { account, setupAccount, finishSetup } = useGame();
   const auth = useAuth();
-  const [step, setStep] = useState<Step>(account.profiles.length ? "save" : "start");
+  const [step, setStep] = useState<Step>(account.profiles.length ? "save" : (initialStep ?? "start"));
   const [name, setName] = useState("");
   const [age, setAge] = useState<AgeBand | null>(null);
   const [days, setDays] = useState(4);
@@ -58,15 +58,8 @@ export function Onboarding() {
 
       {step === "start" && (
         <section className="stack">
-          <h1>You've watched a lot this week. How much do you remember?</h1>
-          <p className="lede">
-            Short videos make learning feel easy, but we keep surprisingly little of what we scroll past. Geek.me gives you one idea at a time:
-            a two-minute read, then three questions that make you recall it. It comes back days later, just as you'd start to forget.
-          </p>
-          <a className="link-btn" href="#/why">
-            Why we built Geek.me, and the research behind it
-          </a>
-          <span className="label">Who's it for?</span>
+          <h1>Who's Geek.me for?</h1>
+          <p className="lede">This sets up your profile. It takes under a minute.</p>
           <div className="choices">
             <button className="choice" onClick={() => setStep("me-name")}>
               <b>Just me</b>
@@ -82,6 +75,9 @@ export function Onboarding() {
               I already have an account
             </button>
           )}
+          <a className="link-btn" href="#/">
+            ← Back
+          </a>
         </section>
       )}
 

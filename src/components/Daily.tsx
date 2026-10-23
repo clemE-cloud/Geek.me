@@ -66,7 +66,7 @@ export function Daily({ standalone = false }: { standalone?: boolean }) {
             <div className="notice stack-sm">
               <b>Want a short lesson like this most days?</b>
               <span>It takes about two minutes. No sign-up needed.</span>
-              <button className="btn" onClick={() => go("")}>
+              <button className="btn" onClick={() => go("start")}>
                 Start learning
               </button>
             </div>
