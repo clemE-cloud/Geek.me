@@ -81,7 +81,7 @@ Signing up is optional: everything works as a guest on one device, and a guest's
 - Changes are saved in the browser immediately and sent to Supabase a moment later (`src/lib/cloud.ts`), so the app keeps working offline.
 - The project address and publishable key are in `src/lib/supabase.ts`. They're safe to publish, because the row-level security rules in `supabase/schema.sql` only let each person read and write their own row. Never put a secret or service-role key in the app.
 
-The **Profile** tab is where people manage everything: picture, name, learning settings, taking a break (missed weeks during a break don't end a run), family profiles, signing in and out, changing email, downloading their data, starting over, and deleting their account. Deleting calls the `delete_my_account()` database function in `supabase/schema.sql`, which can only delete the caller's own account. The Privacy page (`#/privacy`) explains what's stored; add a contact address there before launch.
+The **Profile** tab is where people manage everything: picture, name, learning settings, taking a break (missed weeks during a break don't end a run), family profiles, signing in and out, changing email, downloading their data, starting over, and deleting their account. Deleting calls the `delete_my_account()` database function in `supabase/schema.sql`, which can only delete the caller's own account. The Privacy page (`#/privacy`) explains what's stored and gives a contact address.
 
 Setup in the Supabase dashboard:
 

@@ -1,7 +1,6 @@
 /*
  * Plain-language privacy notice. Keep it in step with what the app actually stores
  * (src/lib/types.ts, supabase/schema.sql) and who it relies on (hosting, email, fonts).
- * TODO before launch: add a contact address for privacy questions and requests.
  */
 export function Privacy() {
   return (
@@ -58,6 +57,12 @@ export function Privacy() {
         </li>
         <li>As a guest, you can delete everything on your device from the same place.</li>
       </ul>
+
+      <h2>Contact</h2>
+      <p>
+        For questions about your data, or if you'd like us to delete it for you, email{" "}
+        <a href="mailto:cewinsm@gmail.com">cewinsm@gmail.com</a>.
+      </p>
     </article>
   );
 }
