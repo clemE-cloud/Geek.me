@@ -50,7 +50,7 @@ Don't change or reuse an `id` once it's published, because saved progress uses i
 
 Pushing to `main` runs `.github/workflows/deploy.yml`. It tests and builds the app, then publishes `dist/` to the `gh-pages` branch, which GitHub Pages serves.
 
-The app is at `https://<your-username>.github.io/<repo-name>/`. If it doesn't appear, open **Settings → Pages** and check that the source is **Deploy from a branch**, using the `gh-pages` branch and the `/ (root)` folder.
+The app is at **https://geekme.io** (a custom domain: the workflow publishes a `CNAME` file, and the domain's DNS points at GitHub Pages). If it doesn't appear, open **Settings → Pages** and check that the source is **Deploy from a branch**, using the `gh-pages` branch and the `/ (root)` folder.
 
 ## Project layout
 
