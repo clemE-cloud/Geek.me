@@ -13,7 +13,17 @@ interface AuthApi {
   sendEmail(email: string): Promise<string | null>;
   verifyCode(email: string, code: string): Promise<string | null>;
   signOut(): Promise<void>;
+  /** Set when an email link couldn't sign the person in, with what to do about it. */
+  linkProblem: string | null;
+  dismissLinkProblem(): void;
 }
+
+// Read before the Supabase client tidies the address bar.
+const arrivedWithCode = new URLSearchParams(window.location.search).has("code");
+const linkError = (() => {
+  const params = new URLSearchParams(window.location.search + "&" + window.location.hash.replace(/^#\/?/, ""));
+  return params.get("error_code") ?? params.get("error");
+})();
 
 const Ctx = createContext<AuthApi | null>(null);
 
@@ -29,12 +39,21 @@ const friendly = (message: string) =>
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [ready, setReady] = useState(!supabase);
+  const [linkProblem, setLinkProblem] = useState<string | null>(null);
 
   useEffect(() => {
     if (!supabase) return;
     const { data } = supabase.auth.onAuthStateChange((event, session) => {
       setUser(session?.user ?? null);
       setReady(true);
+      if (event === "INITIAL_SESSION" && !session && (arrivedWithCode || linkError)) {
+        setLinkProblem(
+          linkError && /expired/i.test(linkError)
+            ? "That sign-in link has expired or was already used. Please ask for a new sign-in email."
+            : "Sign-in links only work in the browser you asked for them from. Open the link there, or ask for a new sign-in email here.",
+        );
+        history.replaceState(null, "", window.location.pathname + "#/");
+      }
       // Tidy the one-time ?code= from an email link out of the address bar.
       if (event === "SIGNED_IN" && window.location.search.includes("code=")) {
         history.replaceState(null, "", window.location.pathname + window.location.hash);
@@ -64,8 +83,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       async signOut() {
         await supabase?.auth.signOut();
       },
+      linkProblem,
+      dismissLinkProblem: () => setLinkProblem(null),
     }),
-    [ready, user],
+    [ready, user, linkProblem],
   );
 
   return <Ctx.Provider value={api}>{children}</Ctx.Provider>;
