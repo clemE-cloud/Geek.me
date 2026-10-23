@@ -22,13 +22,18 @@ export function Circles() {
       <section className="card">
         <span className="label">How circles work</span>
         <ul className="ticks">
-          <li>{child ? "A circle is your family or your class, set up by a parent or teacher." : "A circle is 5 to 8 people: friends, family, or people who like the same topics."}</li>
+          <li>
+            {child
+              ? "A circle is your family or your class, set up by a parent or teacher."
+              : "A circle is 5 to 8 people: friends, family, or people who like the same topics."}
+          </li>
           <li>Everyone's XP adds up toward one weekly goal. If the circle reaches it, everyone gets a special card.</li>
           <li>You can see a ranking inside your circle if you want to. Nobody gets moved down a league.</li>
         </ul>
         <div className="notice">
-          Circles need accounts so you can find each other, and accounts aren't ready yet. For now, your progress is saved on
-          this device.
+          {child
+            ? "Circles aren't ready yet. When they are, a parent or teacher will be able to set one up."
+            : "Circles are coming soon. If you sign in from your profile now, your progress will be ready to share when they arrive."}
         </div>
       </section>
 
@@ -57,7 +62,6 @@ export function Circles() {
             </div>
           ))}
         </div>
-
       </section>
     </div>
   );

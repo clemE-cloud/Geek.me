@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { AccountCard } from "../components/Account";
 import { LESSONS } from "../data/lessons";
 import { AGE_BANDS, defaultsForAge } from "../lib/content";
 import { today } from "../lib/dates";
@@ -7,7 +8,7 @@ import { useGame } from "../lib/useGame";
 import type { AgeBand, Level, Look, TextSize } from "../lib/types";
 
 export function Profile() {
-  const { state, store, updateSettings, reset } = useGame();
+  const { state, updateSettings, reset } = useGame();
   const { name, age, level, look, textSize, daysPerWeek, dailyGoal } = state.settings;
   const [confirming, setConfirming] = useState(false);
 
@@ -24,20 +25,7 @@ export function Profile() {
     <div className="stack">
       <h1>Profile</h1>
 
-      <section className="card">
-        <span className="label">Account</span>
-        {store.kind === "local" ? (
-          <>
-            <h2>Learning as a guest</h2>
-            <p className="note">
-              Your progress is saved in this browser only. Sign-in is on the way. When it arrives, you'll be able to use more than
-              one device and join a circle, and you'll keep the progress you have now.
-            </p>
-          </>
-        ) : (
-          <h2>Signed in</h2>
-        )}
-      </section>
+      <AccountCard />
 
       <section className="card tiles">
         <div>

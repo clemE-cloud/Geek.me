@@ -67,9 +67,21 @@ public/        manifest, icons, service worker
 
 See [`docs/growth-plan.md`](docs/growth-plan.md) for research on how to grow the app and what to build next.
 
-## Accounts (next step)
+## Accounts (Supabase)
 
-Progress goes through the `ProgressStore` interface in `src/lib/storage.ts`. Today the only store is `localStore`. To add accounts, implement a cloud store (the plan is Supabase, with sign-in through GitHub, Google or email) and pass it to `<GameProvider store={...}>`. The screens don't need to change. Guest progress can then be uploaded on first sign-in.
+People can use the app as a guest, with progress kept in the browser, or sign in with their email to save progress to their account and use it on several devices. Sign-in is for ages 13 and up; younger learners stay on this device.
+
+- Sign-in uses a one-time email link or code, so there are no passwords.
+- Guest progress is merged into the account on first sign-in (`src/lib/merge.ts`), without counting the same day twice.
+- Changes are saved in the browser immediately and sent to Supabase a moment later (`src/lib/cloud.ts`), so the app keeps working offline.
+- The project address and publishable key are in `src/lib/supabase.ts`. They're safe to publish, because the row-level security rules in `supabase/schema.sql` only let each person read and write their own row. Never put a secret or service-role key in the app.
+
+Setup in the Supabase dashboard:
+
+1. **Database:** SQL Editor → New query → paste `supabase/schema.sql` → Run.
+2. **Site address:** Authentication → URL Configuration → Site URL `https://<your-username>.github.io/<repo-name>/`. Add `http://localhost:5173/` under Redirect URLs for local development.
+3. **Email code:** Authentication → Emails → Magic Link template. Add `{{ .Token }}` to the message, so people can type the code instead of tapping the link. This is useful when the email opens in a different browser from the installed app.
+4. **Email sending:** Supabase's built-in email service is for testing only and sends to very few addresses. Before real users sign up, connect your own email provider under Authentication → Emails → SMTP Settings.
 
 ## Upgrading from Daily Spark v1
 

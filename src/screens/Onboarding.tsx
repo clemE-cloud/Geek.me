@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { AccountCard } from "../components/Account";
+import { useAuth } from "../lib/auth";
 import { AGE_BANDS, defaultsForAge } from "../lib/content";
 import { useGame } from "../lib/useGame";
 import type { AgeBand } from "../lib/types";
@@ -17,6 +19,7 @@ const GOALS = [
 
 export function Onboarding() {
   const { state, updateSettings } = useGame();
+  const auth = useAuth();
   const [step, setStep] = useState(0);
   const [name, setName] = useState(state.settings.name);
   const [age, setAge] = useState<AgeBand | null>(state.settings.age);
@@ -60,6 +63,26 @@ export function Onboarding() {
           </label>
           <button className="btn wide" onClick={() => setStep(1)}>
             Continue
+          </button>
+          {auth.available && (
+            <button className="btn ghost wide" onClick={() => setStep(-1)}>
+              I already have an account
+            </button>
+          )}
+        </section>
+      )}
+
+      {step === -1 && (
+        <section className="stack">
+          <h1>Welcome back.</h1>
+          <AccountCard />
+          <p className="note">
+            {auth.user
+              ? "No saved progress was found for this account, so let's set it up."
+              : "Your progress will load once you're signed in."}
+          </p>
+          <button className="btn ghost wide" onClick={() => setStep(0)}>
+            {auth.user ? "Continue setting up" : "Back"}
           </button>
         </section>
       )}

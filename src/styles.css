@@ -1103,3 +1103,7 @@ button {
   flex-direction: column;
   gap: 4px;
 }
+
+.small-note {
+  font-size: 13px;
+}
