@@ -16,7 +16,7 @@ Two-minute lessons on science, history, the mind, money, space and more, for any
 | **Daily question** | One question a day, the same for everyone. Anyone can answer it from a shared link (`#/daily`) without signing up, then share their result. |
 | **Any age** | Onboarding asks for an age band. Ages 6–12 get simpler lessons (short sentences, 3-option questions) and no links out of the app; 6–9 also get a brighter look and larger text, and 65+ get larger text. Everyone can change the lesson level, look and text size in Profile. |
 | **Read aloud** | Every lesson has a Listen button that uses the device's built-in voice. |
-| **Circles** | Small study groups with a shared weekly goal and no demotions. *Needs accounts (coming next).* For now it compares you with your own last week. |
+| **Circles** | Groups of up to 8 with one shared weekly XP goal. Friends circles are for ages 16+; family circles can include children, added by their parent. Join with a 6-character code or an invite link (`#/join/CODE`). Reaching the goal earns everyone the Better together badge, and the in-circle ranking is optional. Members see only first names, pictures and weekly XP. |
 
 Progress is saved in the browser (`localStorage`). It also works offline once loaded, and can be added to a phone's home screen.
 

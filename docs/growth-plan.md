@@ -69,8 +69,8 @@ Ordered by value for the effort. ✓ means it's done.
 4. **Privacy-friendly counting** with no cookies and no personal data. That means a tool like Plausible, or a self-built counter. Track: daily-link visits, daily answers, share taps, and how many link visitors start onboarding. Leave it off in under-13 mode.
 
 **After that**
-5. **Accounts** (Supabase), with progress syncing across devices.
-6. **Circles:** friends and family first, classes second. A family circle where everyone does today's lesson at their own level is the feature most likely to be talked about.
+5. ✓ **Accounts** (Supabase), with progress syncing across devices, and parent accounts with child profiles.
+6. ✓ **Circles:** friends and family circles with invite links and a shared weekly goal. Next: classes (a teacher account that manages a class circle).
 7. **"Challenge a friend" on a full lesson:** send your three questions, then compare scores.
 8. **Reminders,** opt-in and at most one a day, with no guilt wording. Web push works for installed PWAs, including on iOS 16.4+.
 9. **Play Store listing** by wrapping the PWA as a Trusted Web Activity (Google's Bubblewrap tool). It's cheap and gives a store presence without a rewrite.

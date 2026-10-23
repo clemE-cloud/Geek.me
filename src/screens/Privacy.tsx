@@ -27,6 +27,13 @@ export function Privacy() {
         marketing.
       </p>
 
+      <h2>Circles</h2>
+      <p>
+        If you join a circle, the other members can see each member's first name, picture and XP for the week, and whether a
+        member is a child. They can't see anything else, such as email addresses or which lessons you've done. Children can
+        only be added to family circles, by their parent. You can leave a circle, or take your child out of one, at any time.
+      </p>
+
       <h2>Children</h2>
       <p>
         Nobody under 16 can have their own account. Children learn on a profile that a parent or guardian creates and manages from
