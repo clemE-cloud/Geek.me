@@ -1,4 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { emptyAccount, mergeAccounts } from "./account";
 import { useAuth } from "./auth";
 import { cacheOwner, createCloudStore, setCacheOwner, type CloudStore, type SyncStatus } from "./cloud";
 import { today } from "./dates";
@@ -11,10 +12,9 @@ import {
   freshState,
   type Achievement,
 } from "./game";
-import { mergeStates } from "./merge";
 import { localStore, type ProgressStore } from "./storage";
 import { supabase } from "./supabase";
-import type { GameState, Lesson, QuizItem, Settings } from "./types";
+import type { Account, GameState, Lesson, Profile, QuizItem, Settings } from "./types";
 
 export interface SessionResult {
   gained: number;
@@ -22,7 +22,12 @@ export interface SessionResult {
 }
 
 interface GameApi {
+  /** The active profile's progress. All lesson and review screens work on this. */
   state: GameState;
+  account: Account;
+  profile: Profile | null;
+  /** True when several people share this account and nobody has been picked in this visit yet. */
+  needsPicker: boolean;
   ready: boolean;
   store: ProgressStore;
   /** Cloud sync state while signed in; "idle" for guests. */
@@ -32,7 +37,18 @@ interface GameApi {
   finishReview(items: QuizItem[], results: boolean[]): SessionResult;
   finishDaily(correct: boolean): SessionResult;
   updateSettings(patch: Partial<Settings>): void;
+  /** Changes another profile's settings, e.g. a parent updating a child's age. */
+  updateProfileSettings(id: string, patch: Partial<Settings>): void;
+  /** Clears the active profile's progress but keeps its name and settings. */
   reset(): Promise<void>;
+  /** Replaces the account during onboarding, before sign-up is offered. */
+  setupAccount(type: Account["type"], profiles: Profile[]): void;
+  finishSetup(): void;
+  chooseProfile(id: string): void;
+  /** Goes back to "Who's learning?". */
+  showPicker(): void;
+  addProfile(profile: Profile): void;
+  removeProfile(id: string): void;
   /** Saves anything pending, signs out and clears this device's copy. */
   signOut(): Promise<void>;
 }
@@ -40,28 +56,74 @@ interface GameApi {
 const Ctx = createContext<GameApi | null>(null);
 
 const SYNC_RETRY = 20_000;
+/** The profile last used on this device (kept across visits). */
+const ACTIVE_KEY = "geekme-active";
+/** Set once someone picks a profile in this browser session, so a shared device asks "Who's learning?" on each new visit. */
+const PICKED_KEY = "geekme-picked";
+
+const read = (where: () => Storage, key: string) => {
+  try {
+    return where().getItem(key);
+  } catch {
+    return null;
+  }
+};
+const write = (where: () => Storage, key: string, value: string | null) => {
+  try {
+    if (value === null) where().removeItem(key);
+    else where().setItem(key, value);
+  } catch {
+    /* ignore */
+  }
+};
+const local = () => localStorage;
+const session = () => sessionStorage;
+
+const profileOf = (a: Account, id: string | null) => a.profiles.find((p) => p.id === id) ?? a.profiles[0] ?? null;
 
 export function GameProvider({ children }: { children: ReactNode }) {
   const auth = useAuth();
-  const [state, setState] = useState<GameState>(freshState);
+  const [account, setAccount] = useState<Account>(emptyAccount);
+  const [activeId, setActiveId] = useState<string | null>(() => read(local, ACTIVE_KEY));
+  const [picked, setPicked] = useState(() => !!read(session, PICKED_KEY));
   const [ready, setReady] = useState(false);
   const [store, setStore] = useState<ProgressStore>(localStore);
   const [sync, setSync] = useState<SyncStatus>("idle");
   const [attempt, setAttempt] = useState(0);
-  // Actions read the latest state and store synchronously so they can return results to the caller.
-  const ref = useRef(state);
+  // Actions read the latest values synchronously so they can return results to the caller.
+  const accountRef = useRef(account);
+  const activeRef = useRef(activeId);
   const storeRef = useRef<ProgressStore>(store);
 
-  const commit = useCallback((next: GameState) => {
-    ref.current = next;
-    setState(next);
+  const profile = profileOf(account, activeId);
+  const state = profile?.state ?? freshState();
+
+  const commitAccount = useCallback((next: Account) => {
+    accountRef.current = next;
+    setAccount(next);
     void storeRef.current.save(next);
   }, []);
+
+  /** Updates the active profile's progress. */
+  const commit = useCallback(
+    (next: GameState) => {
+      const a = accountRef.current;
+      const p = profileOf(a, activeRef.current);
+      if (p) commitAccount({ ...a, profiles: a.profiles.map((x) => (x.id === p.id ? { ...x, state: next } : x)) });
+    },
+    [commitAccount],
+  );
 
   const switchStore = (s: ProgressStore) => {
     storeRef.current = s;
     setStore(s);
   };
+
+  const choose = useCallback((id: string | null) => {
+    activeRef.current = id;
+    setActiveId(id);
+    write(local, ACTIVE_KEY, id);
+  }, []);
 
   // 1. Start from this device's copy, so the app is usable straight away and offline.
   useEffect(() => {
@@ -69,8 +131,8 @@ export function GameProvider({ children }: { children: ReactNode }) {
     localStore.load().then((saved) => {
       if (!live) return;
       if (saved) {
-        ref.current = saved;
-        setState(saved);
+        accountRef.current = saved;
+        setAccount(saved);
       }
       setReady(true);
     });
@@ -91,13 +153,13 @@ export function GameProvider({ children }: { children: ReactNode }) {
       .then((remote) => {
         if (!live) return;
         const owner = cacheOwner();
-        // Guest progress on this device joins the account; another account's leftovers never do.
+        // A guest set-up on this device joins the account; another account's leftovers never do.
         const localIsMine = !owner || owner === "guest" || owner === userId;
-        const local = localIsMine ? ref.current : null;
-        const next = remote && local ? mergeStates(remote, local) : (remote ?? local ?? freshState());
+        const mine = localIsMine && accountRef.current.profiles.length ? accountRef.current : null;
+        const next = remote && mine ? mergeAccounts(remote, mine) : (remote ?? mine ?? emptyAccount());
         setCacheOwner(userId);
         switchStore(cloud);
-        commit(next);
+        commitAccount(next);
       })
       .catch(() => {
         if (!live) return;
@@ -109,7 +171,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
       live = false;
       void cloud.flush();
     };
-  }, [ready, userId, attempt, commit]);
+  }, [ready, userId, attempt, commitAccount]);
 
   // Send pending changes before the page is hidden or closed.
   useEffect(() => {
@@ -123,42 +185,83 @@ export function GameProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  const api = useMemo<GameApi>(
-    () => ({
+  const api = useMemo<GameApi>(() => {
+    // Read through refs so an action always works on the latest progress, even right after another action.
+    const current = () => profileOf(accountRef.current, activeRef.current)?.state ?? freshState();
+    return {
       state,
+      account,
+      profile,
+      needsPicker: account.setupDone && account.profiles.length > 1 && !picked,
       ready,
       store,
       sync,
       answer(kind, correct) {
-        commit(answerFocus(ref.current, kind, correct));
+        commit(answerFocus(current(), kind, correct));
       },
       finishLesson(lesson, results) {
         const t = today();
-        const done = completeLesson(ref.current, lesson, results, t);
+        const done = completeLesson(current(), lesson, results, t);
         const award = awardAchievements(done.state, t);
         commit(award.state);
         return { gained: done.gained, earned: award.earned };
       },
       finishReview(items, results) {
         const t = today();
-        const done = completeReview(ref.current, items, results, t);
+        const done = completeReview(current(), items, results, t);
         const award = awardAchievements(done.state, t);
         commit(award.state);
         return { gained: done.gained, earned: award.earned };
       },
       finishDaily(correct) {
         const t = today();
-        const before = ref.current.xp;
-        const award = awardAchievements(answerDaily(ref.current, t, correct), t);
+        const before = current().xp;
+        const award = awardAchievements(answerDaily(current(), t, correct), t);
         commit(award.state);
         return { gained: award.state.xp - before, earned: award.earned };
       },
       updateSettings(patch) {
-        commit({ ...ref.current, settings: { ...ref.current.settings, ...patch } });
+        const s = current();
+        commit({ ...s, settings: { ...s.settings, ...patch } });
+      },
+      updateProfileSettings(id, patch) {
+        const a = accountRef.current;
+        commitAccount({
+          ...a,
+          profiles: a.profiles.map((x) =>
+            x.id === id ? { ...x, state: { ...x.state, settings: { ...x.state.settings, ...patch } } } : x,
+          ),
+        });
       },
       async reset() {
-        await storeRef.current.clear();
-        commit(freshState());
+        commit({ ...freshState(), settings: current().settings });
+      },
+      setupAccount(type, profiles) {
+        commitAccount({ ...accountRef.current, type, profiles, setupDone: false });
+        choose(profiles[0]?.id ?? null);
+      },
+      finishSetup() {
+        commitAccount({ ...accountRef.current, setupDone: true });
+        // On a family account, start at "Who's learning?".
+        write(session, PICKED_KEY, null);
+        setPicked(false);
+      },
+      chooseProfile(id) {
+        choose(id);
+        write(session, PICKED_KEY, "1");
+        setPicked(true);
+      },
+      showPicker() {
+        write(session, PICKED_KEY, null);
+        setPicked(false);
+      },
+      addProfile(p) {
+        commitAccount({ ...accountRef.current, type: "parent", profiles: [...accountRef.current.profiles, p] });
+      },
+      removeProfile(id) {
+        const a = accountRef.current;
+        commitAccount({ ...a, profiles: a.profiles.filter((p) => p.id !== id) });
+        if (activeRef.current === id) choose(a.profiles.find((p) => p.kind === "self")?.id ?? null);
       },
       async signOut() {
         await (storeRef.current as Partial<CloudStore>).flush?.();
@@ -167,11 +270,13 @@ export function GameProvider({ children }: { children: ReactNode }) {
         setCacheOwner("guest");
         switchStore(localStore);
         setSync("idle");
-        commit(freshState());
+        choose(null);
+        write(session, PICKED_KEY, null);
+        setPicked(false);
+        commitAccount(emptyAccount());
       },
-    }),
-    [state, ready, store, sync, commit, auth],
-  );
+    };
+  }, [state, account, profile, picked, ready, store, sync, commit, commitAccount, choose, auth]);
 
   return <Ctx.Provider value={api}>{children}</Ctx.Provider>;
 }

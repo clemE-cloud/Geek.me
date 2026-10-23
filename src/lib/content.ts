@@ -13,10 +13,17 @@ export function lessonView(id: string, level: Level): Lesson | undefined {
 export const AGE_BANDS: { band: AgeBand; label: string }[] = [
   { band: "6-9", label: "6–9" },
   { band: "10-12", label: "10–12" },
-  { band: "13-17", label: "13–17" },
+  { band: "13-15", label: "13–15" },
+  { band: "16-17", label: "16–17" },
   { band: "18-64", label: "18–64" },
   { band: "65+", label: "65+" },
 ];
+/** Under 16: no account of their own, only a profile on a parent's account. */
+export const isUnder16 = (age: AgeBand | null) => age === "6-9" || age === "10-12" || age === "13-15";
+/** Ages that can have their own account. */
+export const SELF_AGES = AGE_BANDS.filter((a) => !isUnder16(a.band));
+/** Ages for child profiles on a parent account. */
+export const CHILD_AGES = AGE_BANDS.filter((a) => isUnder16(a.band));
 
 /** Starting level, look and text size for an age band. People can change each one in Profile. */
 export function defaultsForAge(age: AgeBand): { level: Level; look: Look; textSize: TextSize } {
@@ -32,7 +39,7 @@ export function defaultsForAge(age: AgeBand): { level: Level; look: Look; textSi
   }
 }
 
-/** Under-13s get no links out of the app (and, later, no open social features). */
+/** Under-13s get simpler lessons by default and no links out of the app. (Under-16s have no account of their own: see isUnder16.) */
 export const isChild = (s: Settings) => s.age === "6-9" || s.age === "10-12";
 
 /* ---------- daily question: the same question for everyone on a given date ---------- */

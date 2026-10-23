@@ -54,7 +54,7 @@ export interface ReviewCard {
   due: string;
 }
 
-export type AgeBand = "6-9" | "10-12" | "13-17" | "18-64" | "65+";
+export type AgeBand = "6-9" | "10-12" | "13-15" | "16-17" | "18-64" | "65+";
 /** "young" = simpler lessons for about 6–12; "standard" for everyone else. */
 export type Level = "young" | "standard";
 export type Look = "calm" | "bright";
@@ -95,4 +95,23 @@ export interface GameState {
 export interface QuizItem {
   lessonId: string;
   qi: number;
+}
+
+/** One learner on an account: the account holder ("self") or a child they manage. */
+export interface Profile {
+  id: string;
+  kind: "self" | "child";
+  state: GameState;
+}
+
+/**
+ * Everything stored for one account (or one guest device). A learner account has a single "self" profile;
+ * a parent account has the parent's own profile plus one profile per child aged 6–12.
+ */
+export interface Account {
+  version: 2;
+  type: "learner" | "parent";
+  profiles: Profile[];
+  /** False until onboarding (including the optional sign-up step) is finished. */
+  setupDone: boolean;
 }

@@ -9,7 +9,7 @@ import { Chip } from "./Bits";
 
 /** One question a day, the same for everyone, so people can compare and share. */
 export function Daily({ standalone = false }: { standalone?: boolean }) {
-  const { state, finishDaily } = useGame();
+  const { state, profile, finishDaily } = useGame();
   const [picked, setPicked] = useState<number | null>(null);
   const t = today();
   const n = dailyNumber(t);
@@ -18,13 +18,14 @@ export function Daily({ standalone = false }: { standalone?: boolean }) {
   if (!lesson) return null;
   const q = lesson.qs[item.qi];
 
-  const answered = t in state.daily;
-  const correct = state.daily[t];
+  // A visitor from a shared link has no profile yet, so their answer is only kept on screen.
+  const answered = profile ? t in state.daily : picked !== null;
+  const correct = profile ? state.daily[t] : picked === q.a;
 
   const pick = (k: number) => {
     if (answered) return;
     setPicked(k);
-    finishDaily(k === q.a);
+    if (profile) finishDaily(k === q.a);
   };
 
   const shareText = `Geek.me daily #${n} ${correct ? "✓" : "✗"}\n“${q.q}”\n${correct ? "I got it. Can you?" : "I missed it. Can you get it?"}`;
@@ -55,13 +56,13 @@ export function Daily({ standalone = false }: { standalone?: boolean }) {
           <p className="note">Everyone gets the same question today. A new one arrives tomorrow.</p>
           <div className="row">
             <ShareButton text={shareText} url={`${appUrl()}#/daily`} label="Challenge a friend" />
-            {standalone && state.settings.onboarded && (
+            {standalone && profile && (
               <button className="btn" onClick={() => go("today")}>
                 Go to today's lesson
               </button>
             )}
           </div>
-          {standalone && !state.settings.onboarded && (
+          {standalone && !profile && (
             <div className="notice stack-sm">
               <b>Want a short lesson like this most days?</b>
               <span>It takes about two minutes. No sign-up needed.</span>

@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useAuth } from "../lib/auth";
-import { isChild } from "../lib/content";
 import { useGame } from "../lib/useGame";
 
 const SYNC_TEXT = {
@@ -11,9 +10,9 @@ const SYNC_TEXT = {
 };
 
 /** Sign-in by email (a link or a code), and the signed-in state. */
-export function AccountCard() {
+export function AccountCard({ compact = false }: { compact?: boolean }) {
   const auth = useAuth();
-  const { state, sync, signOut } = useGame();
+  const { account, profile, sync, signOut } = useGame();
   const [email, setEmail] = useState("");
   const [code, setCode] = useState("");
   const [sentTo, setSentTo] = useState<string | null>(null);
@@ -22,12 +21,16 @@ export function AccountCard() {
 
   if (!auth.available) return null;
 
-  if (isChild(state.settings)) {
+  if (profile?.kind === "child") {
+    const parent = account.profiles.find((p) => p.kind === "self")?.state.settings.name;
     return (
       <section className="card">
         <span className="label">Account</span>
-        <h2>Saved on this device</h2>
-        <p className="note">Accounts are for ages 13 and up. Your progress is kept safely in this browser.</p>
+        <h2>On {parent ? `${parent}'s` : "a parent's"} account</h2>
+        <p className="note">
+          This profile is part of {parent ? `${parent}'s` : "a parent's"} account. Your progress is saved there, and a grown-up
+          looks after the account settings.
+        </p>
       </section>
     );
   }
@@ -104,12 +107,16 @@ export function AccountCard() {
 
   return (
     <section className="card stack-sm">
-      <span className="label">Account</span>
-      <h2>Learning as a guest</h2>
-      <p className="note">
-        Your progress is saved in this browser only. Sign in with your email to keep it safe and use it on other devices. What
-        you've done so far will come with you.
-      </p>
+      {!compact && (
+        <>
+          <span className="label">Account</span>
+          <h2>Learning as a guest</h2>
+          <p className="note">
+            Your progress is saved in this browser only. Sign in with your email to keep it safe and use it on other devices. What
+            you've done so far will come with you.
+          </p>
+        </>
+      )}
       <form
         className="stack-sm"
         onSubmit={(e) => {
@@ -134,7 +141,7 @@ export function AccountCard() {
         </label>
         {error && <p className="note bad-text">{error}</p>}
         <button className="btn" disabled={busy || !email.includes("@")}>
-          {busy ? "Sending…" : "Email me a sign-in link"}
+          {busy ? "Sending…" : "Email me a sign-in code"}
         </button>
       </form>
     </section>

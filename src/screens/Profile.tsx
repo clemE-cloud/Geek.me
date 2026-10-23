@@ -1,19 +1,23 @@
 import { useState } from "react";
 import { AccountCard } from "../components/Account";
+import { FamilySection } from "../components/Family";
 import { LESSONS } from "../data/lessons";
-import { AGE_BANDS, defaultsForAge } from "../lib/content";
+import { SELF_AGES, defaultsForAge } from "../lib/content";
 import { today } from "../lib/dates";
 import { rhythmWeeks } from "../lib/game";
+import { go } from "../lib/router";
 import { useGame } from "../lib/useGame";
 import type { AgeBand, Level, Look, TextSize } from "../lib/types";
 
 export function Profile() {
-  const { state, updateSettings, reset } = useGame();
+  const { state, account, profile, updateSettings, reset, showPicker } = useGame();
   const { name, age, level, look, textSize, daysPerWeek, dailyGoal } = state.settings;
   const [confirming, setConfirming] = useState(false);
+  const child = profile?.kind === "child";
+  const shared = account.profiles.length > 1;
 
   const exportProgress = () => {
-    const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
+    const blob = new Blob([JSON.stringify(account, null, 2)], { type: "application/json" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
     a.download = `geekme-progress-${today()}.json`;
@@ -23,7 +27,14 @@ export function Profile() {
 
   return (
     <div className="stack">
-      <h1>Profile</h1>
+      <h1>{child ? `${name}'s profile` : "Profile"}</h1>
+
+      {shared && (
+        // Back to "Who's learning?". Opening the parent's profile from there asks for the grown-up check.
+        <button className="btn ghost" onClick={showPicker}>
+          Switch profile
+        </button>
+      )}
 
       <AccountCard />
 
@@ -45,35 +56,39 @@ export function Profile() {
       </section>
 
       <section className="card stack-sm">
-        <label className="field">
-          <span className="label">Name</span>
-          <input value={name} maxLength={40} onChange={(e) => updateSettings({ name: e.target.value })} />
-        </label>
-        <label className="field">
-          <span className="label">Age</span>
-          <select
-            value={age ?? ""}
-            onChange={(e) => {
-              const band = e.target.value as AgeBand;
-              updateSettings({ age: band, ...defaultsForAge(band) });
-            }}
-          >
-            {!age && <option value="">Not set</option>}
-            {AGE_BANDS.map((a) => (
-              <option key={a.band} value={a.band}>
-                {a.label}
-              </option>
-            ))}
-          </select>
-          <span className="note">Changing your age also resets the three settings below.</span>
-        </label>
-        <label className="field">
-          <span className="label">Lessons</span>
-          <select value={level} onChange={(e) => updateSettings({ level: e.target.value as Level })}>
-            <option value="young">Simpler (about ages 6–12)</option>
-            <option value="standard">Standard</option>
-          </select>
-        </label>
+        {!child && (
+          <>
+            <label className="field">
+              <span className="label">Name</span>
+              <input value={name} maxLength={40} onChange={(e) => updateSettings({ name: e.target.value })} />
+            </label>
+            <label className="field">
+              <span className="label">Age</span>
+              <select
+                value={age ?? ""}
+                onChange={(e) => {
+                  const band = e.target.value as AgeBand;
+                  updateSettings({ age: band, ...defaultsForAge(band) });
+                }}
+              >
+                {(!age || !SELF_AGES.some((a) => a.band === age)) && <option value="">Not set</option>}
+                {SELF_AGES.map((a) => (
+                  <option key={a.band} value={a.band}>
+                    {a.label}
+                  </option>
+                ))}
+              </select>
+              <span className="note">Changing your age also resets the three settings below.</span>
+            </label>
+            <label className="field">
+              <span className="label">Lessons</span>
+              <select value={level} onChange={(e) => updateSettings({ level: e.target.value as Level })}>
+                <option value="young">Simpler (about ages 6–12)</option>
+                <option value="standard">Standard</option>
+              </select>
+            </label>
+          </>
+        )}
         <label className="field">
           <span className="label">Look</span>
           <select value={look} onChange={(e) => updateSettings({ look: e.target.value as Look })}>
@@ -110,33 +125,38 @@ export function Profile() {
         </label>
       </section>
 
-      <section className="card stack-sm">
-        <span className="label">Your data</span>
-        <button className="btn ghost" onClick={exportProgress}>
-          Download my progress
-        </button>
-        {confirming ? (
-          <div className="row">
-            <button
-              className="btn danger"
-              onClick={async () => {
-                await reset();
-                setConfirming(false);
-                window.location.hash = "/";
-              }}
-            >
-              Yes, erase everything
-            </button>
-            <button className="btn ghost" onClick={() => setConfirming(false)}>
-              Cancel
-            </button>
-          </div>
-        ) : (
-          <button className="btn ghost" onClick={() => setConfirming(true)}>
-            Start over
+      {!child && <FamilySection />}
+
+      {!child && (
+        <section className="card stack-sm">
+          <span className="label">Your data</span>
+          <button className="btn ghost" onClick={exportProgress}>
+            Download {shared ? "our" : "my"} progress
           </button>
-        )}
-      </section>
+          {confirming ? (
+            <div className="row">
+              <button
+                className="btn danger"
+                onClick={async () => {
+                  await reset();
+                  setConfirming(false);
+                  go("today");
+                }}
+              >
+                Yes, clear my progress
+              </button>
+              <button className="btn ghost" onClick={() => setConfirming(false)}>
+                Cancel
+              </button>
+            </div>
+          ) : (
+            <button className="btn ghost" onClick={() => setConfirming(true)}>
+              Start my lessons over
+            </button>
+          )}
+          {shared && <p className="note small-note">This only clears your own progress, not your children's.</p>}
+        </section>
+      )}
     </div>
   );
 }

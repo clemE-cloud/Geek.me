@@ -8,12 +8,13 @@ import { CardView, Collection } from "./screens/Collection";
 import { LessonPlayer } from "./screens/LessonPlayer";
 import { Onboarding } from "./screens/Onboarding";
 import { Profile } from "./screens/Profile";
+import { ProfilePicker } from "./screens/ProfilePicker";
 import { Review } from "./screens/Review";
 import { Sky } from "./screens/Sky";
 import { Today } from "./screens/Today";
 
 export function App() {
-  const { state, ready } = useGame();
+  const { state, account, profile, needsPicker, ready } = useGame();
   const [page = "today", arg = ""] = useRoute();
   const { look, textSize } = state.settings;
 
@@ -25,7 +26,7 @@ export function App() {
   if (!ready) return <div className="splash" aria-busy="true" />;
 
   // Shared daily-question links work before onboarding, so a friend can answer straight away.
-  if (page === "daily" && !state.settings.onboarded) {
+  if (page === "daily" && !account.setupDone) {
     return (
       <main className="wrap solo stack">
         <a className="brand" href="#/">
@@ -35,7 +36,8 @@ export function App() {
       </main>
     );
   }
-  if (!state.settings.onboarded) return <Onboarding />;
+  if (!account.setupDone) return <Onboarding />;
+  if (needsPicker || !profile) return <ProfilePicker />;
 
   if (page === "lesson") {
     return (

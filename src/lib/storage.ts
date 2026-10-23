@@ -1,18 +1,20 @@
 import { FOCUS_MAX, freshState } from "./game";
-import type { GameState } from "./types";
+import { normalizeAccount } from "./account";
+import type { Account, GameState } from "./types";
 
 /**
- * Where progress lives. Today it's the browser (localStorage). An account-backed
- * store (e.g. Supabase) only needs to implement this interface.
+ * Where an account's progress lives: the browser (localStorage) for guests, or Supabase when signed in (cloud.ts).
  */
 export interface ProgressStore {
   readonly kind: "local" | "cloud";
-  load(): Promise<GameState | null>;
-  save(state: GameState): Promise<void>;
+  load(): Promise<Account | null>;
+  save(account: Account): Promise<void>;
   clear(): Promise<void>;
 }
 
-const KEY = "geekme-v2";
+const KEY = "geekme-account";
+/** Single-learner saves from before accounts, and from the original Daily Spark page. */
+const V2_KEY = "geekme-v2";
 const V1_KEY = "daily-spark-v1";
 
 function readJson(key: string): unknown {
@@ -26,21 +28,21 @@ function readJson(key: string): unknown {
 export const localStore: ProgressStore = {
   kind: "local",
   async load() {
-    const saved = readJson(KEY) as GameState | null;
-    if (saved && saved.version === 1) return { ...freshState(), ...saved, settings: { ...freshState().settings, ...saved.settings } };
-    return migrateV1(readJson(V1_KEY));
+    const saved = normalizeAccount(readJson(KEY)) ?? normalizeAccount(readJson(V2_KEY));
+    if (saved) return saved;
+    const v1 = migrateV1(readJson(V1_KEY));
+    return v1 ? normalizeAccount(v1) : null;
   },
-  async save(state) {
+  async save(account) {
     try {
-      localStorage.setItem(KEY, JSON.stringify(state));
+      localStorage.setItem(KEY, JSON.stringify(account));
     } catch {
       /* storage full or blocked: keep playing in memory */
     }
   },
   async clear() {
     try {
-      localStorage.removeItem(KEY);
-      localStorage.removeItem(V1_KEY);
+      for (const k of [KEY, V2_KEY, V1_KEY]) localStorage.removeItem(k);
     } catch {
       /* ignore */
     }

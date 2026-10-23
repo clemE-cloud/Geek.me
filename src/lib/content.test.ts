@@ -79,7 +79,7 @@ describe("age defaults", () => {
     expect(defaultsForAge("18-64")).toEqual({ level: "standard", look: "calm", textSize: "normal" });
     expect(defaultsForAge("65+").textSize).toBe("large");
     expect(isChild({ ...freshState().settings, age: "10-12" })).toBe(true);
-    expect(isChild({ ...freshState().settings, age: "13-17" })).toBe(false);
+    expect(isChild({ ...freshState().settings, age: "13-15" })).toBe(false);
   });
 });
 

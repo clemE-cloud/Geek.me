@@ -4,13 +4,13 @@ import { xpOn } from "../lib/game";
 import { useGame } from "../lib/useGame";
 
 export function Circles() {
-  const { state } = useGame();
+  const { state, profile } = useGame();
   const t = today();
   const days = weekDays(t);
   const thisWeek = days.reduce((n, d) => n + xpOn(state, d), 0);
   const lastWeek = weekDays(addDays(t, -7)).reduce((n, d) => n + xpOn(state, d), 0);
   const max = Math.max(1, ...days.map((d) => xpOn(state, d)));
-  const child = isChild(state.settings);
+  const child = profile?.kind === "child" || isChild(state.settings);
 
   return (
     <div className="stack">

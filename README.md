@@ -69,7 +69,12 @@ See [`docs/growth-plan.md`](docs/growth-plan.md) for research on how to grow the
 
 ## Accounts (Supabase)
 
-People can use the app as a guest, with progress kept in the browser, or sign in with their email to save progress to their account and use it on several devices. Sign-in is for ages 13 and up; younger learners stay on this device.
+There are two kinds of account:
+
+- **Learner accounts** for anyone 16 or older.
+- **Parent accounts**, where a parent adds a profile for each child under 16. Each child's lessons and look follow their age (under-13s get simpler lessons and no links out of the app). Children never sign up or sign in themselves. On a shared device the app opens on "Who's learning?", and opening the parent's profile, where account and family settings live, needs a quick grown-up check.
+
+Signing up is optional: everything works as a guest on one device, and a guest's profiles join the account when they sign in.
 
 - Sign-in uses a one-time email link or code, so there are no passwords.
 - Guest progress is merged into the account on first sign-in (`src/lib/merge.ts`), without counting the same day twice.

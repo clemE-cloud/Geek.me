@@ -1,6 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { normalizeAccount } from "./account";
 import { localStore, type ProgressStore } from "./storage";
-import type { GameState } from "./types";
+import type { Account } from "./types";
 
 export type SyncStatus = "idle" | "syncing" | "synced" | "offline";
 
@@ -17,7 +18,7 @@ const RETRY_DELAY = 20_000;
  * works offline and loads instantly), then sent to Supabase after a short pause, batching quick answers.
  */
 export function createCloudStore(client: SupabaseClient, userId: string, onStatus: (s: SyncStatus) => void): CloudStore {
-  let pending: GameState | null = null;
+  let pending: Account | null = null;
   let timer: ReturnType<typeof setTimeout> | undefined;
 
   const schedule = (ms: number) => {
@@ -47,11 +48,11 @@ export function createCloudStore(client: SupabaseClient, userId: string, onStatu
     async load() {
       const { data, error } = await client.from("progress").select("state").eq("user_id", userId).maybeSingle();
       if (error) throw error;
-      return (data?.state as GameState | undefined) ?? null;
+      return normalizeAccount(data?.state);
     },
-    async save(state) {
-      await localStore.save(state);
-      pending = state;
+    async save(account) {
+      await localStore.save(account);
+      pending = account;
       schedule(SAVE_DELAY);
     },
     async flush() {
