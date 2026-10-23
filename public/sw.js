@@ -1,5 +1,5 @@
 // Offline support: pages are network-first (so updates arrive), everything else is served from cache and refreshed in the background.
-const CACHE = "geekme-v2";
+const CACHE = "geekme-v3";
 
 self.addEventListener("install", () => self.skipWaiting());
 
@@ -22,8 +22,9 @@ self.addEventListener("fetch", (e) => {
   if (!cacheable) return;
 
   if (req.mode === "navigate") {
+    // "no-cache" makes the browser check with the server every time, so a new version shows up on the next open.
     e.respondWith(
-      fetch(req)
+      fetch(req, { cache: "no-cache" })
         .then((res) => {
           const copy = res.clone();
           caches.open(CACHE).then((c) => c.put(req, copy));

@@ -17,7 +17,8 @@ createRoot(document.getElementById("root")!).render(
 
 if (import.meta.env.PROD && "serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./sw.js").catch(() => {
+    // updateViaCache: "none" stops the browser serving an old copy of sw.js itself from its HTTP cache.
+    navigator.serviceWorker.register("./sw.js", { updateViaCache: "none" }).catch(() => {
       /* offline support is a bonus; the app works without it */
     });
   });
