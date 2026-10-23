@@ -228,7 +228,7 @@ const pack: Pack = {
           },
           {
             q: "Who should you share your password with?",
-            o: ["Your best friend", "Everyone", "Nobody, except a trusted grown-up if needed"],
+            o: ["Your best friend", "Everyone", "Nobody, except a trusted adult if needed"],
             a: 2,
             why: "Passwords only work if they're secret.",
           },

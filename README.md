@@ -72,7 +72,7 @@ See [`docs/growth-plan.md`](docs/growth-plan.md) for research on how to grow the
 There are two kinds of account:
 
 - **Learner accounts** for anyone 16 or older.
-- **Parent accounts**, where a parent adds a profile for each child under 16. Each child's lessons and look follow their age (under-13s get simpler lessons and no links out of the app). Children never sign up or sign in themselves. On a shared device the app opens on "Who's learning?", and opening the parent's profile, where account and family settings live, needs a quick grown-up check.
+- **Parent accounts**, where a parent adds a profile for each child under 16. Each child's lessons and look follow their age (under-13s get simpler lessons and no links out of the app). Children never sign up or sign in themselves. On a shared device the app opens on "Who's learning?", and opening the parent's profile, where account and family settings live, needs a quick adult check.
 
 Signing up is optional: everything works as a guest on one device, and a guest's profiles join the account when they sign in.
 

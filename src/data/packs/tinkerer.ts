@@ -240,7 +240,7 @@ const pack: Pack = {
         body: [
           "A whole onion doesn't make you cry. The tears start when you cut it.",
           "Cutting breaks open tiny cells in the onion. Chemicals inside mix and make a gas. When the gas reaches your eyes, they make tears to wash it away. Onions probably do this to stop animals eating them.",
-          "A sharp knife breaks fewer cells, so there's less gas. Chilling the onion first helps too. (Ask a grown-up before using a knife.)",
+          "A sharp knife breaks fewer cells, so there's less gas. Chilling the onion first helps too. (Ask an adult before using a knife.)",
         ],
         takeaway: "Cutting an onion releases a gas that makes your eyes water.",
         qs: [

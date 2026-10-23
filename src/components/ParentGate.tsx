@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 
 /**
- * A light check that a grown-up is at the screen before opening the parent's profile or account settings.
+ * A light check that an adult is at the screen before opening the parent's profile or account settings.
  * It isn't security, just enough to stop a young child wandering into settings by accident.
  */
 export function ParentGate({ onPass, onCancel }: { onPass: () => void; onCancel: () => void }) {
@@ -10,8 +10,8 @@ export function ParentGate({ onPass, onCancel }: { onPass: () => void; onCancel:
   const [wrong, setWrong] = useState(false);
 
   return (
-    <section className="card stack-sm" role="dialog" aria-label="Grown-ups only">
-      <span className="label">Grown-ups only</span>
+    <section className="card stack-sm" role="dialog" aria-label="Adults only">
+      <span className="label">Adults only</span>
       <h2>
         What is {a} × {b}?
       </h2>
@@ -31,7 +31,7 @@ export function ParentGate({ onPass, onCancel }: { onPass: () => void; onCancel:
           aria-label="Answer"
           autoFocus
         />
-        {wrong && <p className="note bad-text">That's not right. Ask a grown-up to help.</p>}
+        {wrong && <p className="note bad-text">That's not right. Ask an adult to help.</p>}
         <div className="row">
           <button className="btn" disabled={!answer}>
             Continue

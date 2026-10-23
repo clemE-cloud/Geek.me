@@ -87,7 +87,7 @@ export function Circles() {
         <CirclesIntro />
         <section className="card stack-sm">
           {child ? (
-            <p className="note">Ask a grown-up to sign in on their profile and add you to your family's circle.</p>
+            <p className="note">Ask an adult to sign in on their profile and add you to your family's circle.</p>
           ) : (
             <>
               <p className="note">Circles need an account, so the people in your circle can find each other.</p>
@@ -144,7 +144,7 @@ export function Circles() {
         <section className="card">
           <p className="note">
             {child
-              ? "You're not in a circle yet. Ask a grown-up to add you to your family's circle."
+              ? "You're not in a circle yet. Ask an adult to add you to your family's circle."
               : "You're not in a circle yet. Start one, or join with a code."}
           </p>
         </section>
@@ -171,7 +171,7 @@ function CirclesIntro() {
       <ul className="ticks">
         <li>
           {child
-            ? "A circle is your family, set up by a grown-up."
+            ? "A circle is your family, set up by an adult."
             : "A circle is up to 8 people: friends, or family including children."}
         </li>
         <li>Everyone's XP adds up toward one weekly goal. Reach it together and everyone gets the Better together badge.</li>
@@ -555,7 +555,7 @@ export function CircleView({ id }: { id: string }) {
           <p className="note">
             Share the code <b className="mono invite-code">{circle.code}</b> or a link.{" "}
             {circle.kind === "family"
-              ? "Grown-ups join with their own account, and parents can add their children."
+              ? "Adults join with their own account, and parents can add their children."
               : "Friends circles are for ages 16 and up."}
           </p>
           <ShareButton text={inviteText(circle)} url={`${appUrl()}#/join/${circle.code}`} label="Share invite" />
@@ -694,7 +694,7 @@ export function JoinCircle({ code }: { code: string }) {
     return (
       <div className="stack">
         <h1>Join a circle</h1>
-        <p className="note">Ask a grown-up to open this invite on their profile. They can add you to the circle.</p>
+        <p className="note">Ask an adult to open this invite on their profile. They can add you to the circle.</p>
       </div>
     );
   }

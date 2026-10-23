@@ -280,12 +280,12 @@ const pack: Pack = {
       young: {
         body: [
           "Your bones might feel like hard rock, but they're alive. They grow, repair themselves and change all the time.",
-          "Babies are born with around 300 bones. As you grow, some of them join together. Grown-ups have 206.",
+          "Babies are born with around 300 bones. As you grow, some of them join together. Adults have 206.",
           "Bones get stronger when you use them, by running, jumping and playing. Inside some bones, a soft part called marrow makes new blood every day.",
         ],
         takeaway: "Your bones are alive, and babies have about 300 that join up into 206.",
         qs: [
-          { q: "How many bones do grown-ups have?", o: ["1,000", "50", "206"], a: 2, why: "Some baby bones join together." },
+          { q: "How many bones do adults have?", o: ["1,000", "50", "206"], a: 2, why: "Some baby bones join together." },
           {
             q: "About how many bones are babies born with?",
             o: ["206", "300", "10"],
@@ -477,7 +477,7 @@ const pack: Pack = {
           },
           {
             q: "Can people live without an appendix?",
-            o: ["Yes", "No", "Only grown-ups"],
+            o: ["Yes", "No", "Only adults"],
             a: 0,
             why: "Many people have theirs removed.",
           },

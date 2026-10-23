@@ -28,7 +28,7 @@ export function AccountCard({ compact = false }: { compact?: boolean }) {
         <span className="label">Account</span>
         <h2>On {parent ? `${parent}'s` : "a parent's"} account</h2>
         <p className="note">
-          This profile is part of {parent ? `${parent}'s` : "a parent's"} account. Your progress is saved there, and a grown-up
+          This profile is part of {parent ? `${parent}'s` : "a parent's"} account. Your progress is saved there, and an adult
           looks after the account settings.
         </p>
       </section>

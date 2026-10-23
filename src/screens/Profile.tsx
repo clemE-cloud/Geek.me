@@ -47,7 +47,7 @@ export function Profile() {
       </section>
 
       {shared && (
-        // Back to "Who's learning?". Opening the parent's profile from there asks for the grown-up check.
+        // Back to "Who's learning?". Opening the parent's profile from there asks for the adult check.
         <button className="btn ghost" onClick={showPicker}>
           Switch profile
         </button>

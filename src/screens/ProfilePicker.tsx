@@ -8,7 +8,7 @@ import { useGame } from "../lib/useGame";
 
 const ageLabel = (band: string | null) => AGE_BANDS.find((a) => a.band === band)?.label;
 
-/** "Who's learning?" on a shared family account. Opening the parent's profile needs a grown-up check. */
+/** "Who's learning?" on a shared family account. Opening the parent's profile needs an adult check. */
 export function ProfilePicker() {
   const { account, chooseProfile } = useGame();
   const [gateFor, setGateFor] = useState<string | null>(null);
