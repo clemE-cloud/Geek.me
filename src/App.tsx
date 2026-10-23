@@ -3,7 +3,8 @@ import { Daily } from "./components/Daily";
 import { Shell } from "./components/Shell";
 import { useRoute } from "./lib/router";
 import { useGame } from "./lib/useGame";
-import { Circles } from "./screens/Circles";
+import { CircleSync } from "./components/CircleSync";
+import { CircleView, Circles, JoinCircle } from "./screens/Circles";
 import { CardView, Collection } from "./screens/Collection";
 import { LessonPlayer } from "./screens/LessonPlayer";
 import { Onboarding } from "./screens/Onboarding";
@@ -44,7 +45,11 @@ export function App() {
       </main>
     );
   }
-  if (!account.setupDone) return <Onboarding />;
+  if (!account.setupDone) {
+    // Keep an invite link for after set-up.
+    if (page === "join" && arg) sessionStorage.setItem("geekme-join", arg);
+    return <Onboarding />;
+  }
   if (needsPicker || !profile) return <ProfilePicker />;
 
   if (page === "lesson") {
@@ -63,8 +68,15 @@ export function App() {
     collection: ["collection", <Collection />],
     card: ["collection", <CardView id={arg} />],
     circles: ["circles", <Circles />],
+    circle: ["circles", <CircleView id={arg} />],
+    join: ["circles", <JoinCircle code={arg} />],
     profile: ["profile", <Profile />],
   };
   const [tab, screen] = screens[page] ?? screens.today;
-  return <Shell tab={tab}>{screen}</Shell>;
+  return (
+    <Shell tab={tab}>
+      <CircleSync />
+      {screen}
+    </Shell>
+  );
 }

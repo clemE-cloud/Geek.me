@@ -33,6 +33,7 @@ export function mergeStates(primary: GameState, other: GameState): GameState {
     reviewsCorrect: Math.max(primary.reviewsCorrect, other.reviewsCorrect),
     achievements: unite(primary.achievements, other.achievements, (x, y) => earlier(x, y)!),
     daily: unite(primary.daily, other.daily, (x, y) => x || y),
+    circleWins: [...new Set([...(primary.circleWins ?? []), ...(other.circleWins ?? [])])],
     breaks: [
       ...(primary.breaks ?? []),
       ...(other.breaks ?? []).filter((b) => !(primary.breaks ?? []).some((p) => p.start === b.start)),

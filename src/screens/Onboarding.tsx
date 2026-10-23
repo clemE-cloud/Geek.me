@@ -44,7 +44,10 @@ export function Onboarding() {
   };
   const done = () => {
     finishSetup();
-    window.location.hash = "/today";
+    // Back to a circle invite if that's how they arrived.
+    const join = sessionStorage.getItem("geekme-join");
+    sessionStorage.removeItem("geekme-join");
+    window.location.hash = join ? `/join/${join}` : "/today";
   };
 
   return (

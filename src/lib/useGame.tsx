@@ -58,6 +58,8 @@ interface GameApi {
   /** Starts a break for the active profile; `until` is the last day, or null for "until I resume". */
   takeBreak(until: string | null): void;
   endBreak(): void;
+  /** Records a reached circle goal for these profiles (any on this account) and awards the badge. */
+  markCircleWin(profileIds: string[], key: string): void;
 }
 
 const Ctx = createContext<GameApi | null>(null);
@@ -276,6 +278,17 @@ export function GameProvider({ children }: { children: ReactNode }) {
       },
       addProfile(p) {
         commitAccount({ ...accountRef.current, type: "parent", profiles: [...accountRef.current.profiles, p] });
+      },
+      markCircleWin(profileIds, key) {
+        const a = accountRef.current;
+        let changed = false;
+        const profiles = a.profiles.map((p) => {
+          if (!profileIds.includes(p.id) || (p.state.circleWins ?? []).includes(key)) return p;
+          changed = true;
+          const withWin = { ...p.state, circleWins: [...(p.state.circleWins ?? []), key] };
+          return { ...p, state: awardAchievements(withWin, today()).state };
+        });
+        if (changed) commitAccount({ ...a, profiles });
       },
       removeProfile(id) {
         const a = accountRef.current;

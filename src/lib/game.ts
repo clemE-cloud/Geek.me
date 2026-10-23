@@ -32,6 +32,7 @@ export const freshState = (): GameState => ({
   achievements: {},
   daily: {},
   breaks: [],
+  circleWins: [],
 });
 
 /* ---------- lessons and the map ---------- */
@@ -255,6 +256,13 @@ export const ACHIEVEMENTS: Achievement[] = [
     desc: "Answer 5 daily questions",
     glyph: "☾",
     test: (s) => Object.keys(s.daily).length >= 5,
+  },
+  {
+    id: "circle-goal",
+    title: "Better together",
+    desc: "Reach a weekly goal with your circle",
+    glyph: "◍",
+    test: (s) => (s.circleWins ?? []).length >= 1,
   },
   { id: "xp-250", title: "250 XP", desc: "Earn 250 XP", glyph: "⚡", test: (s) => s.xp >= 250 },
   { id: "full-sky", title: "Full sky", desc: "Finish every lesson", glyph: "☼", test: (s) => allLearned(s) },

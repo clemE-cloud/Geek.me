@@ -99,6 +99,8 @@ export interface GameState {
   /** Daily question results: date -> answered correctly. */
   daily: Record<string, boolean>;
   breaks: Break[];
+  /** Circle goals reached, as "circleId:weekStart". */
+  circleWins: string[];
 }
 
 export interface QuizItem {

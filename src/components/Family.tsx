@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { makeProfile } from "../lib/account";
 import { CHILD_AGES, defaultsForAge } from "../lib/content";
+import { useAuth } from "../lib/auth";
+import { removeProfileFromCircles } from "../lib/circles";
 import { useGame } from "../lib/useGame";
 import type { AgeBand, Profile } from "../lib/types";
 
@@ -53,6 +55,11 @@ export function AddChildForm({ onAdd, submitLabel = "Add child" }: { onAdd: (p: 
 /** The parent's view of their children's profiles, shown in the parent's own Profile. */
 export function FamilySection() {
   const { account, addProfile, removeProfile, updateProfileSettings } = useGame();
+  const { user } = useAuth();
+  const remove = (id: string) => {
+    removeProfile(id);
+    if (user) void removeProfileFromCircles(user.id, id);
+  };
   const [removing, setRemoving] = useState<string | null>(null);
   const [adding, setAdding] = useState(false);
   const children = account.profiles.filter((p) => p.kind === "child");
@@ -82,7 +89,7 @@ export function FamilySection() {
           </select>
           {removing === p.id ? (
             <span className="row">
-              <button className="btn danger small-btn" onClick={() => (removeProfile(p.id), setRemoving(null))}>
+              <button className="btn danger small-btn" onClick={() => (remove(p.id), setRemoving(null))}>
                 Remove
               </button>
               <button className="btn ghost small-btn" onClick={() => setRemoving(null)}>
