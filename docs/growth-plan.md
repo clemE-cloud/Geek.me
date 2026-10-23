@@ -43,6 +43,18 @@ October 2026. A working plan, not a forecast. Numbers from outside sources are m
 
 **What we built from this:** an under-13 mode has no external links. The Circles copy says children's circles will be family or class groups set up by an adult.
 
+### The gap Geek.me addresses
+
+We take in more than ever and keep very little, because nothing asks us to remember. The evidence behind the landing page and the in-app "Why Geek.me" page (`#/why`):
+
+- People who learned material as a series of short clips remembered less than those who watched the same content as one longer video ([npj Science of Learning, 2025](https://www.nature.com/articles/s41539-025-00399-y)).
+- After TikTok, but not Twitter or YouTube, people were worse at remembering to do something they'd planned ([Chiossi et al., CHI 2023](https://arxiv.org/abs/2302.03714)). Secondary sources quote "about 40%"; the abstract gives no figure, so don't use it.
+- Average attention on one screen fell from about 2.5 minutes (2004) to about 47 seconds ([Gloria Mark, UC](https://www.universityofcalifornia.edu/news/how-sharpen-your-attention-and-meet-your-goals-2024)). This measures switching, not a biological limit.
+- A fluent presenter raises how much people *think* they learned, not how much they did ([Carpenter et al., 2013](https://digest.bps.org.uk/2013/05/14/engaging-lecturers-can-breed-overconfidence/)).
+- Americans reading for pleasure on an average day fell to 16% in 2023, about 40% lower than 20 years earlier ([UCL / iScience, 2025](https://www.ucl.ac.uk/news/2025/aug/proportion-americans-reading-pleasure-fell-40-over-20-years)). Only 32.7% of UK 8–18-year-olds enjoy reading in their free time, a 20-year low ([National Literacy Trust, 2025](https://literacytrust.org.uk/reading-for-pleasure)).
+- Recalling beats rereading for long-term memory ([Roediger & Karpicke, 2006](https://psychology.ecu.edu/wp-content/pv-uploads/sites/216/2019/03/Roediger-Karpicke-2006.pdf)).
+- Left out on purpose: claims about children asking far fewer questions at school. The figures found only came from secondary sources.
+
 ## Who it's for, in order
 
 | Audience | Why they'd care | Where to reach them |

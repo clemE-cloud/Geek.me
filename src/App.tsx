@@ -9,6 +9,7 @@ import { CardView, Collection } from "./screens/Collection";
 import { LessonPlayer } from "./screens/LessonPlayer";
 import { Onboarding } from "./screens/Onboarding";
 import { Privacy } from "./screens/Privacy";
+import { Why } from "./screens/Why";
 import { Profile } from "./screens/Profile";
 import { ProfilePicker } from "./screens/ProfilePicker";
 import { Review } from "./screens/Review";
@@ -38,12 +39,8 @@ export function App() {
       </main>
     );
   }
-  if (page === "privacy") {
-    return (
-      <main className="wrap solo">
-        <Privacy />
-      </main>
-    );
+  if (page === "privacy" || page === "why") {
+    return <main className="wrap solo">{page === "why" ? <Why /> : <Privacy />}</main>;
   }
   if (!account.setupDone) {
     // Keep an invite link for after set-up.

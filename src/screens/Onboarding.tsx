@@ -58,10 +58,14 @@ export function Onboarding() {
 
       {step === "start" && (
         <section className="stack">
-          <h1>Learn something new in two minutes.</h1>
+          <h1>You've watched a lot this week. How much do you remember?</h1>
           <p className="lede">
-            Read a short lesson, answer three questions, and you're done. Science, history, how your brain works and more.
+            Short videos make learning feel easy, but we keep surprisingly little of what we scroll past. Geek.me gives you one idea at a time:
+            a two-minute read, then three questions that make you recall it. It comes back days later, just as you'd start to forget.
           </p>
+          <a className="link-btn" href="#/why">
+            Why we built Geek.me, and the research behind it
+          </a>
           <span className="label">Who's it for?</span>
           <div className="choices">
             <button className="choice" onClick={() => setStep("me-name")}>

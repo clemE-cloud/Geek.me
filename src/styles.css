@@ -1348,3 +1348,32 @@ button {
   letter-spacing: 0.12em;
   color: var(--ink);
 }
+
+/* ---------- why page ---------- */
+.why sup {
+  font: 600 11px var(--mono);
+  margin-left: 2px;
+}
+.why sup a {
+  color: var(--accent);
+  text-decoration: none;
+}
+.source-list {
+  margin: 0;
+  padding-left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.source-list li {
+  font: 14px/1.5 var(--sans);
+  scroll-margin-top: 80px;
+}
+.source-list a {
+  color: var(--muted);
+  text-underline-offset: 3px;
+}
+.onboarding .link-btn {
+  align-self: flex-start;
+  font-size: 15px;
+}
