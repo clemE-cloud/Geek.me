@@ -93,3 +93,17 @@ Setup in the Supabase dashboard:
 ## Upgrading from Daily Spark v1
 
 If you used the original single-page version on the same site, your learned lessons, review schedule and XP are imported automatically the first time you open Geek.me.
+
+## Phone apps (iPhone and Android)
+
+The apps wrap the same web build with [Capacitor](https://capacitorjs.com), so lessons and features match the website. App-only extras: daily reminders (`src/lib/reminders.ts`, `src/components/Reminders.tsx`) and fully offline lessons (files ship inside the app; fonts are bundled for the website too).
+
+```sh
+npm run build && npx cap sync      # copy the latest web build into android/ and ios/
+npx cap open android               # Android Studio: Run, or Build > Generate Signed Bundle for Play
+npx cap open ios                   # Xcode (on a Mac): Run, or Product > Archive for the App Store
+```
+
+- App id: `io.geekme.app`. Icons and splash screens are generated from `assets/` with `npx @capacitor/assets generate`.
+- Sign-in in the apps uses the 6-digit code from the email (links open the website).
+- Store checklist: privacy policy at https://geekme.io/#/privacy, in-app account deletion (Profile), age rating 4+/Everyone with parent-managed child profiles, not in the Kids category.

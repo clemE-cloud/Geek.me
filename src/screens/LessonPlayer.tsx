@@ -4,9 +4,11 @@ import { ListenButton, ShareButton } from "../components/Actions";
 import { Chip, subjectColor } from "../components/Bits";
 import { IconClose } from "../components/Icons";
 import { Quiz } from "../components/Quiz";
+import { ReminderOffer } from "../components/Reminders";
 import { Result } from "../components/Result";
 import { constellationOf } from "../data/constellations";
 import { useAuth } from "../lib/auth";
+import { isNative } from "../lib/native";
 import { isChild, lessonView, toBeats } from "../lib/content";
 import { isLearned, isUnlocked, nextLesson } from "../lib/game";
 import { go } from "../lib/router";
@@ -268,10 +270,11 @@ function AfterLesson({ just }: { just: string }) {
         <section className="card stack-sm save-nudge">
           <span className="label">{count === 1 ? "Your first card" : `${count} cards so far`}</span>
           <h3>Keep {count === 1 ? "it" : "them"}.</h3>
-          <p className="note">Right now this lives only in this browser. Add your email and it's safe on any device. No password.</p>
+          <p className="note">Right now this lives only on this {isNative ? "phone" : "browser"}. Add your email and it's safe on any device. No password.</p>
           <AccountCard compact />
         </section>
       )}
+      <ReminderOffer />
       {view && nc && state.focus > 0 && (
         <button className="card up-next" onClick={() => go(`lesson/${view.id}`)}>
           <span className="label">Up next · {nc.theme}</span>

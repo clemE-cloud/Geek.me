@@ -2,6 +2,7 @@ import { useState } from "react";
 import { AccountCard } from "../components/Account";
 import { AVATARS, Avatar } from "../components/Avatar";
 import { FamilySection } from "../components/Family";
+import { ReminderSettings } from "../components/Reminders";
 import { LESSONS } from "../data/lessons";
 import { useAuth } from "../lib/auth";
 import { SELF_AGES, defaultsForAge } from "../lib/content";
@@ -98,6 +99,8 @@ export function Profile() {
           </button>
         )}
       </section>
+
+      <ReminderSettings />
 
       <BreakCard />
 

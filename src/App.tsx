@@ -4,6 +4,7 @@ import { Shell } from "./components/Shell";
 import { useRoute } from "./lib/router";
 import { useGame } from "./lib/useGame";
 import { CircleSync } from "./components/CircleSync";
+import { ReminderSync } from "./components/ReminderSync";
 import { CircleView, Circles, JoinCircle } from "./screens/Circles";
 import { CardView, Collection } from "./screens/Collection";
 import { LessonPlayer } from "./screens/LessonPlayer";
@@ -78,6 +79,7 @@ export function App() {
   return (
     <Shell tab={tab}>
       <CircleSync />
+      <ReminderSync />
       {screen}
     </Shell>
   );

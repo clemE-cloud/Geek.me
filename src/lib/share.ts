@@ -1,5 +1,7 @@
-/** The app's public address, wherever it is hosted. */
-export const appUrl = () => window.location.origin + window.location.pathname;
+import { Capacitor } from "@capacitor/core";
+
+/** The website's address, wherever it is hosted. Inside the phone apps that's geekme.io, not the app's own local address. */
+export const appUrl = () => (Capacitor.isNativePlatform() ? "https://geekme.io/" : window.location.origin + window.location.pathname);
 
 export type ShareOutcome = "shared" | "copied" | "cancelled" | "failed";
 

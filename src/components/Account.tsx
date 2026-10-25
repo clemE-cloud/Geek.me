@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "../lib/auth";
+import { isNative } from "../lib/native";
 import { useGame } from "../lib/useGame";
 
 const SYNC_TEXT = {
@@ -68,7 +69,8 @@ export function AccountCard({ compact = false }: { compact?: boolean }) {
         <span className="label">Account</span>
         <h2>Check your email</h2>
         <p className="note">
-          We sent a sign-in email to <b>{sentTo}</b>. Open the link in it on this device, or type the code from the email here.
+          We sent a sign-in email to <b>{sentTo}</b>.{" "}
+          {isNative ? "Type the code from the email here." : "Open the link in it on this device, or type the code from the email here."}
         </p>
         <form
           className="stack-sm"
